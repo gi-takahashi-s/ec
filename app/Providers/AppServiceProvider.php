@@ -24,8 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if(config('app.env') === 'production') {
-            URL::forceScheme('https');
+        // カスタムポートを使用する環境でURLが正しく生成されるよう設定
+        if (str_contains(env('APP_URL'), ':8025')) {
+            URL::forceRootUrl(env('APP_URL'));
         }
     }
 }
