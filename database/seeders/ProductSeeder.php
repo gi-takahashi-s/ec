@@ -93,9 +93,9 @@ class ProductSeeder extends Seeder
                     'sale_price' => $salePrice,
                     'stock' => $stock,
                     'sku' => $sku,
-                    'is_active' => true,
+                    'is_visible' => true,
                     'is_featured' => $isFeatured,
-                    'image' => "images/no-image.png", // デフォルト画像
+                    'image_path' => "images/no-image.png", // デフォルト画像
                     'category_id' => $category->id,
                 ]);
             }

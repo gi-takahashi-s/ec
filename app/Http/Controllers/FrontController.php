@@ -15,12 +15,12 @@ class FrontController extends Controller
     {
         // おすすめ商品の取得
         $featuredProducts = Product::where('is_featured', true)
-                                  ->where('is_active', true)
+                                  ->where('is_visible', true)
                                   ->take(8)
                                   ->get();
         
         // 新着商品の取得
-        $newProducts = Product::where('is_active', true)
+        $newProducts = Product::where('is_visible', true)
                              ->orderBy('created_at', 'desc')
                              ->take(8)
                              ->get();

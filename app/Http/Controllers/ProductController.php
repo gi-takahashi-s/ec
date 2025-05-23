@@ -16,7 +16,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::where('is_active', true);
+        $query = Product::where('is_visible', true);
 
         // カテゴリーでフィルタリング
         if ($request->has('category')) {
@@ -66,13 +66,13 @@ class ProductController extends Controller
     public function show($slug)
     {
         $product = Product::where('slug', $slug)
-                          ->where('is_active', true)
+                          ->where('is_visible', true)
                           ->with(['category', 'images'])
                           ->firstOrFail();
 
         $relatedProducts = Product::where('category_id', $product->category_id)
                                  ->where('id', '!=', $product->id)
-                                 ->where('is_active', true)
+                                 ->where('is_visible', true)
                                  ->take(4)
                                  ->get();
 
@@ -92,7 +92,7 @@ class ProductController extends Controller
                            ->firstOrFail();
 
         $products = Product::where('category_id', $category->id)
-                          ->where('is_active', true)
+                          ->where('is_visible', true)
                           ->orderBy('created_at', 'desc')
                           ->paginate(12);
 
@@ -109,7 +109,7 @@ class ProductController extends Controller
     public function featured()
     {
         $featuredProducts = Product::where('is_featured', true)
-                                  ->where('is_active', true)
+                                  ->where('is_visible', true)
                                   ->orderBy('created_at', 'desc')
                                   ->paginate(12);
 
@@ -126,7 +126,7 @@ class ProductController extends Controller
     {
         $searchTerm = $request->input('query');
         
-        $products = Product::where('is_active', true)
+        $products = Product::where('is_visible', true)
                           ->where(function($query) use ($searchTerm) {
                               $query->where('name', 'like', "%{$searchTerm}%")
                                    ->orWhere('description', 'like', "%{$searchTerm}%");

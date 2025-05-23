@@ -31,7 +31,7 @@ return new class extends Migration
                 $table->string('sku')->unique()->after('stock'); // 商品コード
             }
             if (!Schema::hasColumn('products', 'is_featured')) {
-                $table->boolean('is_featured')->default(false)->after('is_active'); // おすすめ商品かどうか
+                $table->boolean('is_featured')->default(false)->after('is_visible'); // おすすめ商品かどうか
             }
             if (!Schema::hasColumn('products', 'category_id')) {
                 $table->unsignedBigInteger('category_id')->nullable()->after('image'); // カテゴリーID

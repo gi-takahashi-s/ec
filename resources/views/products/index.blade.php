@@ -60,7 +60,7 @@
                     <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 hover:shadow-md transition-shadow duration-300">
                         <a href="{{ route('products.show', $product->slug) }}" class="block">
                             <div class="h-48 bg-gray-100 overflow-hidden">
-                                <img src="{{ $product->image ? asset($product->image) : asset('images/no-image.png') }}" 
+                                <img src="{{ $product->image_path ? asset($product->image_path) : asset('images/no-image.png') }}" 
                                     alt="{{ $product->name }}" class="w-full h-full object-cover">
                             </div>
                             <div class="p-4">

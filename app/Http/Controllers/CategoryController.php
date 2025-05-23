@@ -34,7 +34,7 @@ class CategoryController extends Controller
         $category = Category::where('slug', $slug)
                            ->where('is_visible', true)
                            ->with(['products' => function($query) {
-                               $query->where('is_active', true)
+                               $query->where('is_visible', true)
                                      ->orderBy('created_at', 'desc');
                            }])
                            ->firstOrFail();

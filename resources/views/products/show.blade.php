@@ -58,7 +58,7 @@
                     <!-- 商品画像 -->
                     <div>
                         <div class="bg-gray-100 rounded-lg overflow-hidden h-80">
-                            <img src="{{ $product->image ? asset($product->image) : asset('images/no-image.png') }}" 
+                            <img src="{{ $product->image_path ? asset($product->image_path) : asset('images/no-image.png') }}" 
                                 alt="{{ $product->name }}" 
                                 class="w-full h-full object-cover">
                         </div>
@@ -181,7 +181,7 @@
                         <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 hover:shadow-md transition-shadow duration-300">
                             <a href="{{ route('products.show', $relatedProduct->slug) }}" class="block">
                                 <div class="h-48 bg-gray-100 overflow-hidden">
-                                    <img src="{{ $relatedProduct->image ? asset($relatedProduct->image) : asset('images/no-image.png') }}" 
+                                    <img src="{{ $relatedProduct->image_path ? asset($relatedProduct->image_path) : asset('images/no-image.png') }}" 
                                         alt="{{ $relatedProduct->name }}" class="w-full h-full object-cover">
                                 </div>
                                 <div class="p-4">

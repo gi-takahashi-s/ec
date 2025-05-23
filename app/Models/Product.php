@@ -24,9 +24,9 @@ class Product extends Model
         'sale_price',
         'stock',
         'sku',
-        'is_active',
+        'is_visible',
         'is_featured',
-        'image',
+        'image_path',
         'category_id',
     ];
 
@@ -52,6 +52,14 @@ class Product extends Model
     public function mainImage()
     {
         return $this->hasOne(ProductImage::class)->where('is_main', true);
+    }
+
+    /**
+     * 商品のカートアイテムを取得
+     */
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
     }
 
     /**

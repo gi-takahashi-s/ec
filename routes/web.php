@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,6 +33,15 @@ Route::prefix('products')->name('products.')->group(function() {
 Route::prefix('categories')->name('categories.')->group(function() {
     Route::get('/', [CategoryController::class, 'index'])->name('index');
     Route::get('/{slug}', [CategoryController::class, 'show'])->name('show');
+});
+
+// カート関連のルート
+Route::prefix('cart')->name('cart.')->group(function() {
+    Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::post('/add', [CartController::class, 'add'])->name('add');
+    Route::patch('/update/{cartItem}', [CartController::class, 'update'])->name('update');
+    Route::delete('/remove/{cartItem}', [CartController::class, 'remove'])->name('remove');
+    Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
 });
 
 Route::get('/dashboard', function () {
