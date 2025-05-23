@@ -1,31 +1,36 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
+@extends('layouts.front')
+
+@section('title', 'メール認証 - ECサイト')
+
+@section('content')
+<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">メール認証</h2>
+
+    <div class="mb-6 text-sm text-gray-600">
+        ご登録ありがとうございます。ご利用を開始する前に、先ほどお送りしたメールアドレス認証のリンクをクリックして、メールアドレスの確認をお願いします。
+        メールが届いていない場合は、再送信をリクエストすることができます。
     </div>
 
     @if (session('status') == 'verification-link-sent')
-        <div class="mb-4 font-medium text-sm text-green-600 dark:text-green-400">
-            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
+            新しい認証リンクをご登録いただいたメールアドレスに送信しました。
         </div>
     @endif
 
-    <div class="mt-4 flex items-center justify-between">
+    <div class="flex items-center justify-between mt-6">
         <form method="POST" action="{{ route('verification.send') }}">
             @csrf
-
-            <div>
-                <x-primary-button>
-                    {{ __('Resend Verification Email') }}
-                </x-primary-button>
-            </div>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                認証メールを再送信
+            </button>
         </form>
 
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-
-            <button type="submit" class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
-                {{ __('Log Out') }}
+            <button type="submit" class="inline-block align-baseline font-bold text-sm text-blue-600 hover:text-blue-800">
+                ログアウト
             </button>
         </form>
     </div>
-</x-guest-layout>
+</div>
+@endsection
