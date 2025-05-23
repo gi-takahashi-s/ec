@@ -12,11 +12,11 @@
         <div class="container mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-bold">
-                    <a href="{{ route('front.index') }}">ECサイト</a>
+                    <a href="{{ route('welcome') }}">ECサイト</a>
                 </h1>
                 <nav>
                     <ul class="flex space-x-4 items-center">
-                        <li><a href="{{ route('front.index') }}" class="hover:underline">ホーム</a></li>
+                        <li><a href="{{ route('welcome') }}" class="hover:underline">ホーム</a></li>
                         <li><a href="{{ route('front.sub') }}" class="hover:underline">サブページ</a></li>
                         
                         @guest
