@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
@@ -59,5 +60,41 @@ class OrderController extends Controller
 
         return redirect()->route('orders.show', $order)
             ->with('success', '注文をキャンセルしました。');
+    }
+
+    /**
+     * 請求書をダウンロード
+     */
+    public function downloadInvoice(Order $order)
+    {
+        // 自分の注文のみダウンロード可能
+        if ($order->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $pdf = PDF::loadView('orders.invoice', compact('order'));
+        
+        return $pdf->download('invoice-' . $order->order_number . '.pdf');
+    }
+
+    /**
+     * 領収書をダウンロード（支払い済みの場合のみ）
+     */
+    public function downloadReceipt(Order $order)
+    {
+        // 自分の注文のみダウンロード可能
+        if ($order->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // 支払い済みの注文のみ領収書を発行可能
+        if ($order->payment_status !== 'paid') {
+            return redirect()->route('orders.show', $order)
+                ->with('error', '支払いが完了していないため、領収書を発行できません。');
+        }
+
+        $pdf = PDF::loadView('orders.receipt', compact('order'));
+        
+        return $pdf->download('receipt-' . $order->order_number . '.pdf');
     }
 }

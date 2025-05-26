@@ -1,46 +1,49 @@
-@extends('layouts.front')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('パスワード再設定') }}
+        </h2>
+    </x-slot>
 
-@section('title', 'パスワード再設定 - ECサイト')
+    <div class="py-12">
+        <div class="max-w-md mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <form method="POST" action="{{ route('password.store') }}">
+                        @csrf
 
-@section('content')
-<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">パスワード再設定</h2>
+                        <!-- Password Reset Token -->
+                        <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
-    <form method="POST" action="{{ route('password.store') }}">
-        @csrf
+                        <!-- メールアドレス -->
+                        <div class="mb-4">
+                            <x-input-label for="email" :value="__('メールアドレス')" />
+                            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="email" readonly />
+                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                        </div>
 
-        <!-- Password Reset Token -->
-        <input type="hidden" name="token" value="{{ $request->route('token') }}">
+                        <!-- パスワード -->
+                        <div class="mb-4">
+                            <x-input-label for="password" :value="__('新しいパスワード')" />
+                            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
+                            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                        </div>
 
-        <!-- メールアドレス -->
-        <div class="mb-4">
-            <label for="email" class="block text-gray-700 text-sm font-bold mb-2">メールアドレス</label>
-            <input id="email" type="email" class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('email') border-red-500 @enderror" name="email" value="{{ old('email', $request->email) }}" required autocomplete="email" autofocus readonly>
-            @error('email')
-                <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
-            @enderror
+                        <!-- パスワード確認 -->
+                        <div class="mb-6">
+                            <x-input-label for="password_confirmation" :value="__('新しいパスワード（確認）')" />
+                            <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
+                            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                        </div>
+
+                        <div class="flex justify-center">
+                            <x-primary-button>
+                                {{ __('パスワードをリセット') }}
+                            </x-primary-button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <!-- パスワード -->
-        <div class="mb-4">
-            <label for="password" class="block text-gray-700 text-sm font-bold mb-2">新しいパスワード</label>
-            <input id="password" type="password" class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('password') border-red-500 @enderror" name="password" required autocomplete="new-password">
-            @error('password')
-                <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <!-- パスワード確認 -->
-        <div class="mb-6">
-            <label for="password_confirmation" class="block text-gray-700 text-sm font-bold mb-2">新しいパスワード（確認）</label>
-            <input id="password_confirmation" type="password" class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="password_confirmation" required autocomplete="new-password">
-        </div>
-
-        <div class="flex justify-center">
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                パスワードをリセット
-            </button>
-        </div>
-    </form>
-</div>
-@endsection
+    </div>
+</x-app-layout>

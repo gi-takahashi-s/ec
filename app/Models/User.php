@@ -22,6 +22,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
+        'is_admin',
         'password',
     ];
 
@@ -63,8 +64,18 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Get the user's orders.
      */
-    public function orders(): HasMany
+    public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Check if the user is an admin.
+     *
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        return $this->is_admin;
     }
 }

@@ -31,7 +31,7 @@
                                     </svg>
                                 </button>
                                 <div class="absolute right-0 hidden group-hover:block mt-2 py-2 w-48 bg-white rounded-md shadow-lg z-10">
-                                    <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">マイページ</a>
+                                    <a href="{{ route('mypage') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">マイページ</a>
                                     <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">プロフィール編集</a>
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf

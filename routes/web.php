@@ -72,16 +72,42 @@ Route::middleware('auth')->prefix('orders')->name('orders.')->group(function() {
     Route::get('/', [OrderController::class, 'index'])->name('index');
     Route::get('/{order}', [OrderController::class, 'show'])->name('show');
     Route::patch('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
+    Route::get('/{order}/invoice', [OrderController::class, 'downloadInvoice'])->name('invoice');
+    Route::get('/{order}/receipt', [OrderController::class, 'downloadReceipt'])->name('receipt');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/mypage', function () {
+    return view('mypage');
+})->middleware(['auth', 'verified'])->name('mypage');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// 管理者ルート
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+    // ダッシュボード
+    Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+    
+    // 商品管理
+    Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
+    
+    // 注文管理
+    Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
+    Route::patch('/orders/{order}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.update-status');
+    
+    // ユーザー管理
+    Route::resource('users', App\Http\Controllers\Admin\UserController::class)->except(['create', 'store']);
+    
+    // 売上レポート
+    Route::get('/reports/sales', [App\Http\Controllers\Admin\ReportController::class, 'sales'])->name('reports.sales');
+    Route::get('/reports/products', [App\Http\Controllers\Admin\ReportController::class, 'products'])->name('reports.products');
+    
+    // サイト設定
+    Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
+    Route::patch('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 });
 
 require __DIR__.'/auth.php';

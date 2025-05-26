@@ -70,7 +70,7 @@
                     </div>
 
                     <!-- 注文詳細 -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
                             <!-- 注文商品 -->
                             <div class="mb-6">
@@ -151,6 +151,24 @@
                                 @if($order->paid_at)
                                     <p>支払い日時: {{ $order->paid_at->format('Y年m月d日 H:i') }}</p>
                                 @endif
+                                
+                                <div class="mt-3 flex flex-wrap gap-2">
+                                    <a href="{{ route('orders.invoice', $order) }}" target="_blank" class="inline-flex items-center px-3 py-1 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:border-blue-700 focus:ring ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                        </svg>
+                                        請求書
+                                    </a>
+                                    
+                                    @if($order->payment_status == 'paid')
+                                        <a href="{{ route('orders.receipt', $order) }}" target="_blank" class="inline-flex items-center px-3 py-1 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-800 focus:outline-none focus:border-green-700 focus:ring ring-green-300 disabled:opacity-25 transition ease-in-out duration-150">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            領収書
+                                        </a>
+                                    @endif
+                                </div>
                             </div>
 
                             <!-- 金額情報 -->
