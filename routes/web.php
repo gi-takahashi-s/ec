@@ -5,6 +5,9 @@ use App\Http\Controllers\FrontController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ShippingAddressController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -42,6 +45,33 @@ Route::prefix('cart')->name('cart.')->group(function() {
     Route::patch('/update/{cartItem}', [CartController::class, 'update'])->name('update');
     Route::delete('/remove/{cartItem}', [CartController::class, 'remove'])->name('remove');
     Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
+});
+
+// 配送先住所関連のルート
+Route::middleware('auth')->prefix('shipping-addresses')->name('shipping_addresses.')->group(function() {
+    Route::get('/', [ShippingAddressController::class, 'index'])->name('index');
+    Route::get('/create', [ShippingAddressController::class, 'create'])->name('create');
+    Route::post('/', [ShippingAddressController::class, 'store'])->name('store');
+    Route::get('/{shippingAddress}/edit', [ShippingAddressController::class, 'edit'])->name('edit');
+    Route::patch('/{shippingAddress}', [ShippingAddressController::class, 'update'])->name('update');
+    Route::delete('/{shippingAddress}', [ShippingAddressController::class, 'destroy'])->name('destroy');
+    Route::patch('/{shippingAddress}/set-default', [ShippingAddressController::class, 'setDefault'])->name('set_default');
+});
+
+// チェックアウト関連のルート
+Route::middleware('auth')->prefix('checkout')->name('checkout.')->group(function() {
+    Route::get('/address', [CheckoutController::class, 'address'])->name('address');
+    Route::post('/address', [CheckoutController::class, 'selectAddress'])->name('select_address');
+    Route::get('/confirm', [CheckoutController::class, 'confirm'])->name('confirm');
+    Route::post('/process', [CheckoutController::class, 'process'])->name('process');
+    Route::get('/complete/{order}', [CheckoutController::class, 'complete'])->name('complete');
+});
+
+// 注文関連のルート
+Route::middleware('auth')->prefix('orders')->name('orders.')->group(function() {
+    Route::get('/', [OrderController::class, 'index'])->name('index');
+    Route::get('/{order}', [OrderController::class, 'show'])->name('show');
+    Route::patch('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
 });
 
 Route::get('/dashboard', function () {

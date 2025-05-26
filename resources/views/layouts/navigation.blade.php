@@ -61,6 +61,14 @@
                             {{ __('Profile') }}
                         </x-dropdown-link>
 
+                        <x-dropdown-link :href="route('orders.index')">
+                            {{ __('注文履歴') }}
+                        </x-dropdown-link>
+
+                        <x-dropdown-link :href="route('shipping_addresses.index')">
+                            {{ __('配送先住所') }}
+                        </x-dropdown-link>
+
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -130,6 +138,14 @@
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('orders.index')">
+                    {{ __('注文履歴') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('shipping_addresses.index')">
+                    {{ __('配送先住所') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->
