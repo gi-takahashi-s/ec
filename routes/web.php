@@ -94,6 +94,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // 商品管理
     Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
     
+    // カテゴリー管理
+    Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
+    
     // 注文管理
     Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
     Route::patch('/orders/{order}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.update-status');

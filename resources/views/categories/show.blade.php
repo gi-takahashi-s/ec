@@ -1,3 +1,7 @@
+@php
+    use Illuminate\Support\Facades\Storage;
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
@@ -54,41 +58,72 @@
 
             <!-- カテゴリーヘッダー -->
             <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-                <div class="p-6">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ $category->name }}</h1>
-                    @if($category->description)
-                        <p class="text-lg text-gray-600 mb-4">{{ $category->description }}</p>
-                    @endif
+                <div class="md:flex">
+                    <!-- カテゴリー画像 -->
+                    <div class="md:w-1/3 bg-gray-100">
+                        @if($category->image_path)
+                            <img src="{{ Storage::url($category->image_path) }}" 
+                                alt="{{ $category->name }}" class="w-full h-full object-cover">
 
-                    <!-- サブカテゴリーがある場合 -->
-                    @if($category->children && $category->children->count() > 0)
-                        <div class="mt-8">
-                            <h2 class="text-xl font-semibold text-gray-800 mb-4">サブカテゴリー</h2>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                                @foreach($category->children as $child)
-                                    <a href="{{ route('categories.show', $child->slug) }}" 
-                                        class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <div>
-                                            <h3 class="font-medium text-gray-900">{{ $child->name }}</h3>
-                                            @if($child->description)
-                                                <p class="text-sm text-gray-600 line-clamp-1">{{ $child->description }}</p>
-                                            @endif
-                                        </div>
-                                        <svg class="ml-auto h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                        </svg>
-                                    </a>
-                                @endforeach
+                                <p>画像パス: {{ $category->image_path }}</p>
+                                <p>ストレージURL: {{ Storage::url($category->image_path) }}</p>
+                        @else
+                            <div class="w-full h-64 md:h-full flex items-center justify-center bg-gray-200">
+                                <svg class="h-20 w-20 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
                             </div>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
+                    <!-- カテゴリー情報 -->
+                    <div class="md:w-2/3 p-6">
+                        <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ $category->name }}</h1>
+                        @if($category->description)
+                            <p class="text-lg text-gray-600 mb-4">{{ $category->description }}</p>
+                        @endif
+
+                        <!-- サブカテゴリーがある場合 -->
+                        @if($category->children && $category->children->count() > 0)
+                            <div class="mt-8">
+                                <h2 class="text-xl font-semibold text-gray-800 mb-4">サブカテゴリー</h2>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                    @foreach($category->children as $child)
+                                        <a href="{{ route('categories.show', $child->slug) }}" 
+                                            class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                            @if($child->image_path)
+                                                <div class="flex-shrink-0 w-16 h-16 mr-3 overflow-hidden rounded">
+                                                    <img src="{{ Storage::url($child->image_path) }}" 
+                                                        alt="{{ $child->name }}" class="w-full h-full object-cover">
+                                                </div>
+                                            @else
+                                                <div class="flex-shrink-0 w-16 h-16 mr-3 bg-gray-200 rounded flex items-center justify-center">
+                                                    <svg class="h-8 w-8 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                </div>
+                                            @endif
+                                            <div>
+                                                <h3 class="font-medium text-gray-900">{{ $child->name }}</h3>
+                                                @if($child->description)
+                                                    <p class="text-sm text-gray-600 line-clamp-1">{{ $child->description }}</p>
+                                                @endif
+                                            </div>
+                                            <svg class="ml-auto h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
 
             <!-- 商品一覧 -->
             <div class="mb-6">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ $category->name }}の商品一覧</h2>
-                <p class="text-gray-600">{{ $products->total() }}件の商品</p>
+                <p class="text-gray-600">{{ $products->total() }}件の商品（サブカテゴリーを含む）</p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
@@ -96,8 +131,13 @@
                     <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 hover:shadow-md transition-shadow duration-300">
                         <a href="{{ route('products.show', $product->slug) }}" class="block">
                             <div class="h-48 bg-gray-100 overflow-hidden">
-                                <img src="{{ $product->image ? asset($product->image) : asset('images/no-image.png') }}" 
-                                    alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                @if($product->mainImage && $product->mainImage->image_path)
+                                    <img src="{{ Storage::url($product->mainImage->image_path) }}" 
+                                        alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                @else
+                                    <img src="{{ asset('images/no-image.png') }}" 
+                                        alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                @endif
                             </div>
                             <div class="p-4">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ $product->name }}</h3>

@@ -25,7 +25,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::query()->with('category');
+        $query = Product::query()->with(['category', 'mainImage']);
         
         // 検索フィルタリング
         if ($request->has('search')) {
@@ -133,7 +133,7 @@ class ProductController extends Controller
             
             ProductImage::create([
                 'product_id' => $product->id,
-                'path' => $path,
+                'image_path' => $path,
                 'is_main' => true,
             ]);
         }
@@ -145,7 +145,7 @@ class ProductController extends Controller
                 
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'path' => $path,
+                    'image_path' => $path,
                     'is_main' => false,
                 ]);
             }
@@ -216,7 +216,7 @@ class ProductController extends Controller
             
             ProductImage::create([
                 'product_id' => $product->id,
-                'path' => $path,
+                'image_path' => $path,
                 'is_main' => true,
             ]);
         }
@@ -228,7 +228,7 @@ class ProductController extends Controller
                 
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'path' => $path,
+                    'image_path' => $path,
                     'is_main' => false,
                 ]);
             }
@@ -246,8 +246,8 @@ class ProductController extends Controller
                 }
                 
                 // ストレージから画像を削除
-                if (Storage::disk('public')->exists($image->path)) {
-                    Storage::disk('public')->delete($image->path);
+                if (Storage::disk('public')->exists($image->image_path)) {
+                    Storage::disk('public')->delete($image->image_path);
                 }
                 
                 // データベースから削除
@@ -266,8 +266,8 @@ class ProductController extends Controller
     {
         // 商品に関連する画像を削除
         foreach ($product->images as $image) {
-            if (Storage::disk('public')->exists($image->path)) {
-                Storage::disk('public')->delete($image->path);
+            if (Storage::disk('public')->exists($image->image_path)) {
+                Storage::disk('public')->delete($image->image_path);
             }
         }
         

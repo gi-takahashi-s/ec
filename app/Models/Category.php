@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Product;
 
 class Category extends Model
 {
@@ -46,5 +47,14 @@ class Category extends Model
     public function products()
     {
         return $this->hasMany(Product::class);
+    }
+
+    /**
+     * カテゴリーとその子カテゴリーに属する全ての商品を取得
+     */
+    public function allProducts()
+    {
+        $categoryIds = $this->children()->pluck('id')->push($this->id);
+        return Product::whereIn('category_id', $categoryIds);
     }
 }

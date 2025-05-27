@@ -144,7 +144,7 @@
                             @foreach($product->images as $image)
                                 <div class="relative group">
                                     <div class="aspect-w-1 aspect-h-1 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
-                                        <img src="{{ Storage::url($image->path) }}" alt="{{ $product->name }}" class="w-full h-full object-center object-cover">
+                                        <img src="{{ Storage::url($image->image_path) }}" alt="{{ $product->name }}" class="w-full h-full object-center object-cover">
                                     </div>
                                     <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                         <div class="flex space-x-2">

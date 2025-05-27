@@ -47,7 +47,7 @@
                     </div>
 
                     <!-- 注文内容確認 -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="md:col-span-2">
                             <!-- 商品一覧 -->
                             <div class="mb-6">
@@ -56,8 +56,8 @@
                                     @foreach ($cart->items as $item)
                                         <div class="flex items-center p-4 border-b border-gray-200 dark:border-gray-600 last:border-0">
                                             <div class="w-16 h-16 flex-shrink-0 bg-gray-200 dark:bg-gray-600 rounded overflow-hidden">
-                                                @if ($item->product->image_path)
-                                                    <img src="{{ asset('storage/' . $item->product->image_path) }}" alt="{{ $item->product->name }}" class="w-full h-full object-cover">
+                                                @if ($item->product->mainImage && $item->product->mainImage->image_path)
+                                                    <img src="{{ Storage::url($item->product->mainImage->image_path) }}" alt="{{ $item->product->name }}" class="w-full h-full object-cover">
                                                 @else
                                                     <div class="w-full h-full flex items-center justify-center text-gray-500 dark:text-gray-400">
                                                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

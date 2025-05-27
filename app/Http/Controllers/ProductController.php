@@ -16,15 +16,15 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::where('is_visible', true);
+        $query = Product::where('is_visible', true)->with(['mainImage']);
 
         // カテゴリーでフィルタリング
-        if ($request->has('category')) {
+        if ($request->filled('category')) {
             $query->where('category_id', $request->category);
         }
 
         // 検索キーワードでフィルタリング
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $searchTerm = $request->search;
             $query->where(function($q) use ($searchTerm) {
                 $q->where('name', 'like', "%{$searchTerm}%")
@@ -73,6 +73,7 @@ class ProductController extends Controller
         $relatedProducts = Product::where('category_id', $product->category_id)
                                  ->where('id', '!=', $product->id)
                                  ->where('is_visible', true)
+                                 ->with(['mainImage'])
                                  ->take(4)
                                  ->get();
 
@@ -93,6 +94,7 @@ class ProductController extends Controller
 
         $products = Product::where('category_id', $category->id)
                           ->where('is_visible', true)
+                          ->with(['mainImage'])
                           ->orderBy('created_at', 'desc')
                           ->paginate(12);
 
@@ -110,6 +112,7 @@ class ProductController extends Controller
     {
         $featuredProducts = Product::where('is_featured', true)
                                   ->where('is_visible', true)
+                                  ->with(['mainImage'])
                                   ->orderBy('created_at', 'desc')
                                   ->paginate(12);
 
@@ -131,6 +134,7 @@ class ProductController extends Controller
                               $query->where('name', 'like', "%{$searchTerm}%")
                                    ->orWhere('description', 'like', "%{$searchTerm}%");
                           })
+                          ->with(['mainImage'])
                           ->orderBy('created_at', 'desc')
                           ->paginate(12);
 

@@ -69,9 +69,9 @@
             <!-- 商品画像 -->
             <div class="w-full md:w-1/3 p-6 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700">
                 <div class="space-y-4">
-                    @if($product->mainImage && $product->mainImage->path)
+                    @if($product->mainImage && $product->mainImage->image_path)
                         <div class="aspect-w-1 aspect-h-1 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
-                            <img src="{{ Storage::url($product->mainImage->path) }}" alt="{{ $product->name }}" class="w-full h-full object-center object-cover">
+                            <img src="{{ Storage::url($product->mainImage->image_path) }}" alt="{{ $product->name }}" class="w-full h-full object-center object-cover">
                         </div>
                     @else
                         <div class="aspect-w-1 aspect-h-1 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
@@ -85,7 +85,7 @@
                         <div class="grid grid-cols-4 gap-2">
                             @foreach($product->images->where('is_main', false) as $image)
                                 <div class="aspect-w-1 aspect-h-1 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
-                                    <img src="{{ Storage::url($image->path) }}" alt="{{ $product->name }}" class="w-full h-full object-center object-cover">
+                                    <img src="{{ Storage::url($image->image_path) }}" alt="{{ $product->name }}" class="w-full h-full object-center object-cover">
                                 </div>
                             @endforeach
                         </div>

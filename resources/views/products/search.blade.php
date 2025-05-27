@@ -68,8 +68,13 @@
                     <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 hover:shadow-md transition-shadow duration-300">
                         <a href="{{ route('products.show', $product->slug) }}" class="block">
                             <div class="h-48 bg-gray-100 overflow-hidden">
-                                <img src="{{ $product->image ? asset($product->image) : asset('images/no-image.png') }}" 
-                                    alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                @if($product->mainImage && $product->mainImage->image_path)
+                                    <img src="{{ Storage::url($product->mainImage->image_path) }}" 
+                                        alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                @else
+                                    <img src="{{ asset('images/no-image.png') }}" 
+                                        alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                @endif
                             </div>
                             <div class="p-4">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ $product->name }}</h3>

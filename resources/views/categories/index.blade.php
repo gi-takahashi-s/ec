@@ -1,3 +1,7 @@
+@php
+    use Illuminate\Support\Facades\Storage;
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -11,6 +15,19 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 @foreach($categories as $category)
                     <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <!-- カテゴリー画像 -->
+                        <div class="h-48 bg-gray-100 overflow-hidden">
+                            @if($category->image_path)
+                                <img src="{{ Storage::url($category->image_path) }}" 
+                                    alt="{{ $category->name }}" class="w-full h-full object-cover">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center bg-gray-200">
+                                    <svg class="h-16 w-16 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                            @endif
+                        </div>
                         <div class="p-6">
                             <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ $category->name }}</h2>
                             @if($category->description)
@@ -29,6 +46,18 @@
                                         @foreach($category->children as $child)
                                             <a href="{{ route('categories.show', $child->slug) }}" 
                                                 class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                                @if($child->image_path)
+                                                    <div class="flex-shrink-0 w-12 h-12 mr-3 overflow-hidden rounded">
+                                                        <img src="{{ Storage::url($child->image_path) }}" 
+                                                            alt="{{ $child->name }}" class="w-full h-full object-cover">
+                                                    </div>
+                                                @else
+                                                    <div class="flex-shrink-0 w-12 h-12 mr-3 bg-gray-200 rounded flex items-center justify-center">
+                                                        <svg class="h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                    </div>
+                                                @endif
                                                 <div>
                                                     <h4 class="font-medium text-gray-900">{{ $child->name }}</h4>
                                                     @if($child->description)

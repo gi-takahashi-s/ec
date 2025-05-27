@@ -58,16 +58,22 @@
                     <!-- 商品画像 -->
                     <div>
                         <div class="bg-gray-100 rounded-lg overflow-hidden h-80">
-                            <img src="{{ $product->image_path ? asset($product->image_path) : asset('images/no-image.png') }}" 
-                                alt="{{ $product->name }}" 
-                                class="w-full h-full object-cover">
+                            @if($product->mainImage && $product->mainImage->image_path)
+                                <img src="{{ Storage::url($product->mainImage->image_path) }}" 
+                                    alt="{{ $product->name }}" 
+                                    class="w-full h-full object-cover">
+                            @else
+                                <img src="{{ asset('images/no-image.png') }}" 
+                                    alt="{{ $product->name }}" 
+                                    class="w-full h-full object-cover">
+                            @endif
                         </div>
                         <!-- 商品サブ画像（もしあれば） -->
                         @if($product->images && $product->images->count() > 0)
                         <div class="grid grid-cols-4 gap-2 mt-4">
                             @foreach($product->images as $image)
                             <div class="bg-gray-100 rounded-lg overflow-hidden h-20">
-                                <img src="{{ asset($image->path) }}" 
+                                <img src="{{ Storage::url($image->image_path) }}" 
                                     alt="{{ $product->name }}" 
                                     class="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity">
                             </div>
@@ -181,8 +187,13 @@
                         <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 hover:shadow-md transition-shadow duration-300">
                             <a href="{{ route('products.show', $relatedProduct->slug) }}" class="block">
                                 <div class="h-48 bg-gray-100 overflow-hidden">
-                                    <img src="{{ $relatedProduct->image_path ? asset($relatedProduct->image_path) : asset('images/no-image.png') }}" 
-                                        alt="{{ $relatedProduct->name }}" class="w-full h-full object-cover">
+                                    @if($relatedProduct->mainImage && $relatedProduct->mainImage->image_path)
+                                        <img src="{{ Storage::url($relatedProduct->mainImage->image_path) }}" 
+                                            alt="{{ $relatedProduct->name }}" class="w-full h-full object-cover">
+                                    @else
+                                        <img src="{{ asset('images/no-image.png') }}" 
+                                            alt="{{ $relatedProduct->name }}" class="w-full h-full object-cover">
+                                    @endif
                                 </div>
                                 <div class="p-4">
                                     <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ $relatedProduct->name }}</h3>

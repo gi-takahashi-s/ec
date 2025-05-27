@@ -39,7 +39,7 @@ class CategoryController extends Controller
                            }])
                            ->firstOrFail();
 
-        $products = $category->products()->paginate(12);
+        $products = $category->allProducts()->where('is_visible', true)->with('mainImage')->paginate(12);
 
         return view('categories.show', compact('category', 'products'));
     }

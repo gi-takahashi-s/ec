@@ -88,6 +88,9 @@ class CheckoutController extends Controller
 
         $address = ShippingAddress::findOrFail($shippingAddressId);
         
+        // 商品データと画像をEagerロード
+        $cart->load(['items.product.mainImage']);
+        
         // カートの合計金額を計算
         $subtotal = $cart->items->sum(function($item) {
             return $item->product->price * $item->quantity;
@@ -124,6 +127,9 @@ class CheckoutController extends Controller
         }
 
         $address = ShippingAddress::findOrFail($shippingAddressId);
+        
+        // 商品データと画像をEagerロード
+        $cart->load(['items.product.mainImage']);
         
         // 注文情報の準備
         $subtotal = $cart->items->sum(function($item) {

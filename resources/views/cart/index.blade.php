@@ -64,8 +64,13 @@
                                             <td class="py-4 px-6 text-left">
                                                 <div class="flex items-center">
                                                     <div class="mr-3 w-16 h-16 flex-shrink-0">
-                                                        <img src="{{ $item->product->image_path ? asset($item->product->image_path) : asset('images/no-image.png') }}" 
-                                                            alt="{{ $item->product->name }}" class="w-full h-full object-cover rounded">
+                                                        @if($item->product->mainImage && $item->product->mainImage->image_path)
+                                                            <img src="{{ Storage::url($item->product->mainImage->image_path) }}" 
+                                                                alt="{{ $item->product->name }}" class="w-full h-full object-cover rounded">
+                                                        @else
+                                                            <img src="{{ asset('images/no-image.png') }}" 
+                                                                alt="{{ $item->product->name }}" class="w-full h-full object-cover rounded">
+                                                        @endif
                                                     </div>
                                                     <div>
                                                         <a href="{{ route('products.show', $item->product->slug) }}" class="font-medium text-indigo-600 hover:text-indigo-800">

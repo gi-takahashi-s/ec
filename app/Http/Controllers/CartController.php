@@ -18,6 +18,9 @@ class CartController extends Controller
     {
         $cart = $this->getCart();
         
+        // 商品データと画像をEagerロード
+        $cart->load(['items.product.mainImage']);
+        
         return view('cart.index', compact('cart'));
     }
     
