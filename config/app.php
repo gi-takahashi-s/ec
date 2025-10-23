@@ -60,6 +60,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Admin URL
+    |--------------------------------------------------------------------------
+    |
+    | This URL path is used for admin panel access. You can customize 
+    | the admin panel URL by changing this value.
+    |
+    */
+
+    'admin_url' => '/admin', // デフォルト値、SystemSettingServiceProviderで上書きされる
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |
@@ -69,7 +81,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Tokyo',
 
     /*
     |--------------------------------------------------------------------------
@@ -82,7 +94,7 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => 'ja',
 
     /*
     |--------------------------------------------------------------------------
@@ -95,7 +107,7 @@ return [
     |
     */
 
-    'fallback_locale' => 'en',
+    'fallback_locale' => 'ja',
 
     /*
     |--------------------------------------------------------------------------
@@ -108,7 +120,7 @@ return [
     |
     */
 
-    'faker_locale' => 'en_US',
+    'faker_locale' => 'ja_JP',
 
     /*
     |--------------------------------------------------------------------------
@@ -191,6 +203,7 @@ return [
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
+        App\Providers\SystemSettingServiceProvider::class, // RouteServiceProviderより前に読み込み
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,

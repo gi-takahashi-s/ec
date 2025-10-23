@@ -6,7 +6,14 @@
     <!-- アクションボタン -->
     <div class="mb-6 flex justify-between">
         <div>
-            <a href="{{ route('admin.products.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            @php
+                $referer = request()->header('referer');
+                $backUrl = route('admin.products.index');
+                if ($referer && str_contains($referer, '/admin/products') && !str_contains($referer, '/admin/products/')) {
+                    $backUrl = $referer;
+                }
+            @endphp
+            <a href="{{ $backUrl }}" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
@@ -23,6 +30,38 @@
             <form action="{{ route('admin.products.destroy', $product) }}" method="POST" class="inline-block">
                 @csrf
                 @method('DELETE')
+                <!-- 検索・フィルターパラメータを保持（リファラーから取得） -->
+                @php
+                    $referer = request()->header('referer');
+                    $query = [];
+                    if ($referer && str_contains($referer, '/admin/products')) {
+                        $parsed = parse_url($referer);
+                        if (isset($parsed['query'])) {
+                            parse_str($parsed['query'], $query);
+                        }
+                    }
+                @endphp
+                @if(isset($query['search']))
+                    <input type="hidden" name="search" value="{{ $query['search'] }}">
+                @endif
+                @if(isset($query['category_id']))
+                    <input type="hidden" name="category_id" value="{{ $query['category_id'] }}">
+                @endif
+                @if(isset($query['stock_status']))
+                    <input type="hidden" name="stock_status" value="{{ $query['stock_status'] }}">
+                @endif
+                @if(isset($query['visibility']))
+                    <input type="hidden" name="visibility" value="{{ $query['visibility'] }}">
+                @endif
+                @if(isset($query['sort']))
+                    <input type="hidden" name="sort" value="{{ $query['sort'] }}">
+                @endif
+                @if(isset($query['direction']))
+                    <input type="hidden" name="direction" value="{{ $query['direction'] }}">
+                @endif
+                @if(isset($query['page']))
+                    <input type="hidden" name="page" value="{{ $query['page'] }}">
+                @endif
                 <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" 
                     onclick="return confirm('本当にこの商品を削除しますか？この操作は元に戻せません。')">
                     <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

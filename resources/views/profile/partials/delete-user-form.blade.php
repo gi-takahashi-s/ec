@@ -1,6 +1,6 @@
 <section>
     <div class="max-w-xl">
-        <p class="text-sm text-gray-600 mb-4">
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
             アカウントを削除すると、アカウントに関連するすべてのリソースとデータが完全に削除されます。アカウントを削除する前に、保持したいデータや情報をダウンロードしてください。
         </p>
 
@@ -18,24 +18,24 @@
             @csrf
             @method('delete')
 
-            <h2 class="text-lg font-medium text-gray-900">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
                 本当にアカウントを削除しますか？
             </h2>
 
-            <p class="mt-1 text-sm text-gray-600">
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 アカウントを削除すると、アカウントに関連するすべてのリソースとデータが完全に削除されます。アカウントを完全に削除することを確認するために、パスワードを入力してください。
             </p>
 
             <div class="mt-6">
-                <label for="password" class="block text-gray-700 text-sm font-bold mb-2">パスワード</label>
-                <input id="password" name="password" type="password" class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-1 block w-3/4" placeholder="パスワード">
+                <label for="password" class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">パスワード</label>
+                <input id="password" name="password" type="password" class="appearance-none border border-gray-300 dark:border-gray-600 rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-800 leading-tight focus:outline-none focus:shadow-outline focus:border-indigo-500 mt-1 block w-3/4" placeholder="パスワード">
                 @error('password', 'userDeletion')
                     <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
             <div class="mt-6 flex justify-end">
-                <button x-on:click="$dispatch('close')" type="button" class="text-gray-700 bg-white hover:bg-gray-100 py-2 px-4 mr-3 rounded border border-gray-300">
+                <button x-on:click="$dispatch('close')" type="button" class="text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 py-2 px-4 mr-3 rounded border border-gray-300 dark:border-gray-600">
                     キャンセル
                 </button>
                 <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">

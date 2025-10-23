@@ -26,7 +26,6 @@ class Product extends Model
         'sku',
         'is_visible',
         'is_featured',
-        'image_path',
         'category_id',
     ];
 

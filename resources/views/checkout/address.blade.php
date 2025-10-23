@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 px-4">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
@@ -31,12 +31,26 @@
                                 <div class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-gray-300 dark:border-gray-600 text-center">
                                     <span class="text-xl font-bold">2</span>
                                 </div>
-                                <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-gray-500 dark:text-gray-400">確認</div>
+                                <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-gray-500 dark:text-gray-400">配送</div>
                             </div>
                             <div class="flex-auto border-t-2 transition duration-500 ease-in-out border-gray-300 dark:border-gray-600"></div>
                             <div class="flex items-center text-gray-500 dark:text-gray-400 relative">
                                 <div class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-gray-300 dark:border-gray-600 text-center">
                                     <span class="text-xl font-bold">3</span>
+                                </div>
+                                <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-gray-500 dark:text-gray-400">支払い</div>
+                            </div>
+                            <div class="flex-auto border-t-2 transition duration-500 ease-in-out border-gray-300 dark:border-gray-600"></div>
+                            <div class="flex items-center text-gray-500 dark:text-gray-400 relative">
+                                <div class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-gray-300 dark:border-gray-600 text-center">
+                                    <span class="text-xl font-bold">4</span>
+                                </div>
+                                <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-gray-500 dark:text-gray-400">確認</div>
+                            </div>
+                            <div class="flex-auto border-t-2 transition duration-500 ease-in-out border-gray-300 dark:border-gray-600"></div>
+                            <div class="flex items-center text-gray-500 dark:text-gray-400 relative">
+                                <div class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-gray-300 dark:border-gray-600 text-center">
+                                    <span class="text-xl font-bold">5</span>
                                 </div>
                                 <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-gray-500 dark:text-gray-400">完了</div>
                             </div>
@@ -75,7 +89,7 @@
                             </div>
                             
                             <div class="flex items-center justify-between mt-8">
-                                <a href="{{ route('shipping_addresses.create') }}" class="text-blue-600 dark:text-blue-400 hover:underline">
+                                <a href="{{ route('shipping_addresses.create', ['from_checkout' => 1]) }}" class="text-blue-600 dark:text-blue-400 hover:underline">
                                     新しい住所を追加
                                 </a>
                                 
@@ -92,7 +106,7 @@
                     @else
                         <div class="text-center py-8">
                             <p class="text-gray-500 dark:text-gray-400 mb-4">配送先住所が登録されていません。</p>
-                            <a href="{{ route('shipping_addresses.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                            <a href="{{ route('shipping_addresses.create', ['from_checkout' => 1]) }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                 新しい住所を追加
                             </a>
                         </div>

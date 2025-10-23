@@ -27,8 +27,8 @@
                         <label for="is_monthly" class="block text-sm font-medium text-gray-700 dark:text-gray-300">集計単位</label>
                         <select name="is_monthly" id="is_monthly" 
                             class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="0" {{ !$isMonthly ? 'selected' : '' }}>日別</option>
-                            <option value="1" {{ $isMonthly ? 'selected' : '' }}>月別</option>
+                            <option value="0" {{ (request('is_monthly') === '0' || (!request()->has('is_monthly') && !$isMonthly)) ? 'selected' : '' }}>日別</option>
+                            <option value="1" {{ (request('is_monthly') === '1' || (!request()->has('is_monthly') && $isMonthly)) ? 'selected' : '' }}>月別</option>
                         </select>
                     </div>
                     
@@ -189,7 +189,7 @@
                             @foreach($paymentMethodStats as $stat)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                        {{ $stat->payment_method }}
+                                        {{ $paymentMethods[$stat->payment_method] ?? $stat->payment_method }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                         {{ number_format($stat->count) }}
@@ -389,8 +389,9 @@
     // 支払い方法別グラフ
     const paymentMethodCtx = document.getElementById('paymentMethodChart').getContext('2d');
     const paymentMethodStats = @json($paymentMethodStats);
+    const paymentMethodLabels = @json($paymentMethods);
     
-    const paymentMethods = paymentMethodStats.map(data => data.payment_method);
+    const paymentMethods = paymentMethodStats.map(data => paymentMethodLabels[data.payment_method] || data.payment_method);
     const paymentTotals = paymentMethodStats.map(data => data.total);
     const backgroundColor = [
         'rgba(79, 70, 229, 0.7)',

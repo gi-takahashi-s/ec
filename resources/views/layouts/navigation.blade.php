@@ -6,7 +6,14 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('mypage') }}">
-                        <img src="{{ asset('images/logo.png') }}" alt="logo" class="h-8 w-auto">
+                        @php
+                            $shopDisplay = \App\Services\ShopSettingService::getShopLogoOrName();
+                        @endphp
+                        @if($shopDisplay['type'] === 'logo')
+                            <img src="{{ $shopDisplay['value'] }}" alt="{{ $shopDisplay['alt'] }}" class="h-8 w-auto">
+                        @else
+                            <span class="text-xl font-bold text-gray-800 dark:text-white">{{ $shopDisplay['value'] }}</span>
+                        @endif
                     </a>
                 </div>
 
@@ -23,9 +30,6 @@
                     </x-nav-link>
                     <x-nav-link :href="route('products.featured')" :active="request()->routeIs('products.featured')">
                         {{ __('おすすめ商品') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('mypage')" :active="request()->routeIs('mypage')">
-                        {{ __('マイページ') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -57,8 +61,12 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        <x-dropdown-link :href="route('mypage')">
+                            {{ __('マイページ') }}
+                        </x-dropdown-link>
+
                         <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
+                            プロフィール
                         </x-dropdown-link>
 
                         <x-dropdown-link :href="route('orders.index')">
@@ -76,7 +84,7 @@
                             <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                                ログアウト
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -116,9 +124,6 @@
             <x-responsive-nav-link :href="route('products.featured')" :active="request()->routeIs('products.featured')">
                 {{ __('おすすめ商品') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('mypage')" :active="request()->routeIs('mypage')">
-                {{ __('マイページ') }}
-            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.index')" class="flex items-center">
                 <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
@@ -136,8 +141,12 @@
             </div>
 
             <div class="mt-3 space-y-1">
+                <x-responsive-nav-link :href="route('mypage')">
+                    {{ __('マイページ') }}
+                </x-responsive-nav-link>
+
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
+                    プロフィール
                 </x-responsive-nav-link>
 
                 <x-responsive-nav-link :href="route('orders.index')">
@@ -155,7 +164,7 @@
                     <x-responsive-nav-link :href="route('logout')"
                             onclick="event.preventDefault();
                                         this.closest('form').submit();">
-                        {{ __('Log Out') }}
+                        ログアウト
                     </x-responsive-nav-link>
                 </form>
             </div>

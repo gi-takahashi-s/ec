@@ -20,7 +20,19 @@ class ProductController extends Controller
 
         // カテゴリーでフィルタリング
         if ($request->filled('category')) {
-            $query->where('category_id', $request->category);
+            $categoryId = $request->category;
+            $category = Category::find($categoryId);
+            
+            if ($category) {
+                // 選択されたカテゴリーが親カテゴリーの場合、子カテゴリーも含める
+                $categoryIds = [$categoryId];
+                if ($category->children()->exists()) {
+                    $categoryIds = array_merge($categoryIds, $category->children()->pluck('id')->toArray());
+                }
+                $query->whereIn('category_id', $categoryIds);
+            } else {
+                $query->where('category_id', $categoryId);
+            }
         }
 
         // 検索キーワードでフィルタリング
@@ -52,7 +64,7 @@ class ProductController extends Controller
         }
 
         $products = $query->paginate(12);
-        $categories = Category::where('is_visible', true)->orderBy('sort_order')->get();
+        $categories = Category::where('is_visible', true)->with('children')->whereNull('parent_id')->orderBy('sort_order')->get();
 
         return view('products.index', compact('products', 'categories'));
     }

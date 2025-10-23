@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git rm:*)",
+      "Bash(find:*)",
+      "Bash(php artisan:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

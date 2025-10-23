@@ -14,66 +14,40 @@
         </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 px-4">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- パンくずリスト -->
-            <nav class="flex mb-6" aria-label="Breadcrumb">
-                <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                    <li class="inline-flex items-center">
-                        <a href="{{ route('welcome') }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-indigo-600">
-                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                            </svg>
-                            ホーム
-                        </a>
-                    </li>
-                    <li>
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                            </svg>
-                            <a href="{{ route('categories.index') }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-indigo-600 md:ml-2">カテゴリー一覧</a>
-                        </div>
-                    </li>
-                    @if($category->parent)
-                    <li>
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                            </svg>
-                            <a href="{{ route('categories.show', $category->parent->slug) }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-indigo-600 md:ml-2">{{ $category->parent->name }}</a>
-                        </div>
-                    </li>
-                    @endif
-                    <li aria-current="page">
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                            </svg>
-                            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">{{ $category->name }}</span>
-                        </div>
-                    </li>
-                </ol>
-            </nav>
+            @php
+                $breadcrumbItems = [
+                    ['title' => 'ホーム', 'url' => route('welcome'), 'icon' => true],
+                    ['title' => 'カテゴリー一覧', 'url' => route('categories.index')]
+                ];
+                
+                if($category->parent) {
+                    $breadcrumbItems[] = ['title' => $category->parent->name, 'url' => route('categories.show', $category->parent->slug)];
+                }
+                
+                $breadcrumbItems[] = ['title' => $category->name, 'current' => true];
+            @endphp
+            <x-breadcrumb :items="$breadcrumbItems" />
 
             <!-- カテゴリーヘッダー -->
             <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
                 <div class="md:flex">
                     <!-- カテゴリー画像 -->
-                    <div class="md:w-1/3 bg-gray-100">
-                        @if($category->image_path)
-                            <img src="{{ Storage::url($category->image_path) }}" 
-                                alt="{{ $category->name }}" class="w-full h-full object-cover">
-
-                                <p>画像パス: {{ $category->image_path }}</p>
-                                <p>ストレージURL: {{ Storage::url($category->image_path) }}</p>
-                        @else
-                            <div class="w-full h-64 md:h-full flex items-center justify-center bg-gray-200">
-                                <svg class="h-20 w-20 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                        @endif
+                    <div class="md:w-1/3">
+                        <div class="aspect-w-16 aspect-h-9 bg-gray-100">
+                            @if($category->image_path)
+                                <img src="{{ Storage::url($category->image_path) }}" 
+                                    alt="{{ $category->name }}" class="w-full h-full object-cover">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center bg-gray-200">
+                                    <svg class="h-20 w-20 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                     <!-- カテゴリー情報 -->
                     <div class="md:w-2/3 p-6">
@@ -91,15 +65,19 @@
                                         <a href="{{ route('categories.show', $child->slug) }}" 
                                             class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                                             @if($child->image_path)
-                                                <div class="flex-shrink-0 w-16 h-16 mr-3 overflow-hidden rounded">
-                                                    <img src="{{ Storage::url($child->image_path) }}" 
-                                                        alt="{{ $child->name }}" class="w-full h-full object-cover">
+                                                <div class="flex-shrink-0 w-16 mr-3 overflow-hidden rounded">
+                                                    <div class="aspect-w-16 aspect-h-9">
+                                                        <img src="{{ Storage::url($child->image_path) }}" 
+                                                            alt="{{ $child->name }}" class="w-full h-full object-cover">
+                                                    </div>
                                                 </div>
                                             @else
-                                                <div class="flex-shrink-0 w-16 h-16 mr-3 bg-gray-200 rounded flex items-center justify-center">
-                                                    <svg class="h-8 w-8 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                    </svg>
+                                                <div class="flex-shrink-0 w-16 mr-3 rounded">
+                                                    <div class="aspect-w-16 aspect-h-9 bg-gray-200 flex items-center justify-center">
+                                                        <svg class="h-8 w-8 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                    </div>
                                                 </div>
                                             @endif
                                             <div>

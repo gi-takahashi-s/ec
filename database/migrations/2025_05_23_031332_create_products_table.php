@@ -20,8 +20,8 @@ return new class extends Migration
             $table->text('description')->nullable(); // 商品説明
             $table->text('features')->nullable(); // 商品特徴
             $table->text('specifications')->nullable(); // 商品仕様
-            $table->decimal('price', 10, 2); // 価格
-            $table->decimal('sale_price', 10, 2)->nullable(); // セール価格
+            $table->integer('price'); // 価格
+            $table->integer('sale_price')->nullable(); // セール価格
             $table->integer('stock')->default(0); // 在庫数
             $table->string('sku')->unique(); // 商品コード
             $table->boolean('is_visible')->default(true); // 表示/非表示

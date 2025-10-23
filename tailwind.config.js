@@ -1,11 +1,14 @@
-const defaultTheme = require('tailwindcss/defaultTheme');
+import defaultTheme from 'tailwindcss/defaultTheme';
+import forms from '@tailwindcss/forms';
+import aspectRatio from '@tailwindcss/aspect-ratio';
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
+        './resources/js/**/*.js',
     ],
 
     darkMode: 'class',
@@ -18,5 +21,5 @@ module.exports = {
         },
     },
 
-    plugins: [require('@tailwindcss/forms')],
+    plugins: [forms, aspectRatio],
 };

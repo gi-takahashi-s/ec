@@ -134,6 +134,37 @@
         </div>
     </div>
 
+    <!-- 注文ステータス -->
+    <div class="mt-8">
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                    注文ステータス概要
+                </h3>
+            </div>
+            <div class="p-4">
+                <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">未処理</p>
+                        <p class="mt-1 text-3xl font-semibold text-yellow-500">{{ $pendingOrders }}</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">処理中</p>
+                        <p class="mt-1 text-3xl font-semibold text-blue-500">{{ $processingOrders }}</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">完了</p>
+                        <p class="mt-1 text-3xl font-semibold text-green-500">{{ $completedOrders }}</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">キャンセル</p>
+                        <p class="mt-1 text-3xl font-semibold text-red-500">{{ $cancelledOrders }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 注文とグラフ -->
     <div class="mt-8 grid grid-cols-1 gap-5 lg:grid-cols-2">
         <!-- 最近の注文 -->
@@ -165,7 +196,15 @@
                                             @elseif($order->order_status === 'processing') bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100
                                             @elseif($order->order_status === 'cancelled') bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100
                                             @else bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100 @endif">
-                                            {{ ucfirst($order->order_status) }}
+                                            @if($order->order_status === 'completed')
+                                                完了
+                                            @elseif($order->order_status === 'processing')
+                                                処理中
+                                            @elseif($order->order_status === 'cancelled')
+                                                キャンセル
+                                            @else
+                                                未処理
+                                            @endif
                                         </p>
                                     </div>
                                 </div>
@@ -196,37 +235,6 @@
             </div>
             <div class="p-4">
                 <canvas id="salesChart" height="300"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- 注文ステータス -->
-    <div class="mt-8">
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
-            <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-                    注文ステータス概要
-                </h3>
-            </div>
-            <div class="p-4">
-                <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">未処理</p>
-                        <p class="mt-1 text-3xl font-semibold text-yellow-500">{{ $pendingOrders }}</p>
-                    </div>
-                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">処理中</p>
-                        <p class="mt-1 text-3xl font-semibold text-blue-500">{{ $processingOrders }}</p>
-                    </div>
-                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">完了</p>
-                        <p class="mt-1 text-3xl font-semibold text-green-500">{{ $completedOrders }}</p>
-                    </div>
-                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">キャンセル</p>
-                        <p class="mt-1 text-3xl font-semibold text-red-500">{{ $cancelledOrders }}</p>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

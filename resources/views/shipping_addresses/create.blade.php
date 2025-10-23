@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 px-4">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
@@ -123,7 +123,8 @@
                         <!-- デフォルト設定 -->
                         <div class="mb-6">
                             <label class="inline-flex items-center">
-                                <input type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="is_default" {{ old('is_default') ? 'checked' : '' }}>
+                                <input type="hidden" name="is_default" value="0">
+                                <input type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="is_default" value="1" {{ old('is_default') ? 'checked' : '' }}>
                                 <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">この住所をデフォルトに設定する</span>
                             </label>
                         </div>

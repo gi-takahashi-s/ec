@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 px-4">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
@@ -30,16 +30,36 @@
                                 <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-green-600 dark:text-green-400">住所</div>
                             </div>
                             <div class="flex-auto border-t-2 transition duration-500 ease-in-out border-green-600 dark:border-green-400"></div>
+                            <div class="flex items-center text-green-600 dark:text-green-400 relative">
+                                <div class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-green-600 dark:border-green-400 text-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-green-600 dark:text-green-400">配送</div>
+                            </div>
+                            <div class="flex-auto border-t-2 transition duration-500 ease-in-out border-green-600 dark:border-green-400"></div>
+                            <div class="flex items-center text-green-600 dark:text-green-400 relative">
+                                <div class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-green-600 dark:border-green-400 text-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-green-600 dark:text-green-400">支払い</div>
+                            </div>
+                            <div class="flex-auto border-t-2 transition duration-500 ease-in-out border-green-600 dark:border-green-400"></div>
                             <div class="flex items-center text-blue-600 dark:text-blue-400 relative">
                                 <div class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-blue-600 dark:border-blue-400 text-center">
-                                    <span class="text-xl font-bold">2</span>
+                                    <span class="text-xl font-bold">4</span>
                                 </div>
                                 <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-blue-600 dark:text-blue-400">確認</div>
                             </div>
                             <div class="flex-auto border-t-2 transition duration-500 ease-in-out border-gray-300 dark:border-gray-600"></div>
                             <div class="flex items-center text-gray-500 dark:text-gray-400 relative">
                                 <div class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-gray-300 dark:border-gray-600 text-center">
-                                    <span class="text-xl font-bold">3</span>
+                                    <span class="text-xl font-bold">5</span>
                                 </div>
                                 <div class="absolute top-0 -ml-10 text-center mt-16 w-32 text-xs font-medium uppercase text-gray-500 dark:text-gray-400">完了</div>
                             </div>
@@ -95,17 +115,93 @@
                                 </div>
                             </div>
 
+                            <!-- 配送情報 -->
+                            <div class="mb-6">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h3 class="text-lg font-semibold">配送情報</h3>
+                                    <a href="{{ route('checkout.shipping') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">変更</a>
+                                </div>
+                                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                                    <div class="flex items-center mb-2">
+                                        <svg class="w-6 h-6 mr-2 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                        </svg>
+                                        <span class="font-semibold">{{ $shippingCompany->name }}</span>
+                                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ $shippingCompany->method_name }}</span>
+                                    </div>
+                                    @if($deliveryTime)
+                                        <p class="text-sm text-gray-600 dark:text-gray-300">配送時間: {{ $deliveryTime }}</p>
+                                    @else
+                                        <p class="text-sm text-gray-600 dark:text-gray-300">配送時間: 指定なし</p>
+                                    @endif
+                                    @if($shippingCompany->notes)
+                                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">{{ $shippingCompany->notes }}</p>
+                                    @endif
+                                </div>
+                            </div>
+
                             <!-- 支払い方法 -->
                             <div class="mb-6">
-                                <h3 class="text-lg font-semibold mb-3">支払い方法</h3>
+                                <div class="flex justify-between items-center mb-3">
+                                    <h3 class="text-lg font-semibold">支払い方法</h3>
+                                    <a href="{{ route('checkout.payment-method') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">変更</a>
+                                </div>
                                 <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                                    <div class="flex items-center">
-                                        <svg class="w-6 h-6 mr-2 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                                        </svg>
-                                        <span>クレジットカード（Stripe決済）</span>
-                                    </div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">注文確定後に決済画面に移動します。</p>
+                                    @if($paymentMethod === 'stripe')
+                                        <div class="flex items-center">
+                                            <svg class="w-6 h-6 mr-2 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                                            </svg>
+                                            <span class="font-semibold">クレジットカード決済</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">注文確定後に決済画面に移動します。</p>
+                                    @elseif($paymentMethod === 'bank_transfer')
+                                        <div class="flex items-center">
+                                            <svg class="w-6 h-6 mr-2 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                            </svg>
+                                            <span class="font-semibold">銀行振込</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">注文確定後、振込先情報をご案内いたします。</p>
+                                        @if($paymentMethodDetails && !empty($paymentMethodDetails->settings['notes']))
+                                        <div class="mt-3 p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-md">
+                                            <div class="flex items-start">
+                                                <svg class="w-5 h-5 text-orange-600 dark:text-orange-400 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                                </svg>
+                                                <div class="text-sm text-orange-800 dark:text-orange-200">
+                                                    <p class="font-medium">ご注意事項</p>
+                                                    <div class="mt-1 text-xs">
+                                                        {!! nl2br(e($paymentMethodDetails->settings['notes'])) !!}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
+                                    @elseif($paymentMethod === 'cash_on_delivery')
+                                        <div class="flex items-center">
+                                            <svg class="w-6 h-6 mr-2 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                            </svg>
+                                            <span class="font-semibold">代金引換</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">商品受け取り時に代金をお支払いください。</p>
+                                        @if($paymentMethodDetails && !empty($paymentMethodDetails->settings['notes']))
+                                        <div class="mt-3 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-md">
+                                            <div class="flex items-start">
+                                                <svg class="w-5 h-5 text-purple-600 dark:text-purple-400 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                                </svg>
+                                                <div class="text-sm text-purple-800 dark:text-purple-200">
+                                                    <p class="font-medium">ご注意事項</p>
+                                                    <div class="mt-1 text-xs">
+                                                        {!! nl2br(e($paymentMethodDetails->settings['notes'])) !!}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -128,6 +224,12 @@
                                         <span>送料</span>
                                         <span>{{ number_format($shippingFee) }}円</span>
                                     </div>
+                                    @if($paymentMethod === 'cash_on_delivery' && isset($codFee) && $codFee > 0)
+                                    <div class="flex justify-between">
+                                        <span>代引手数料</span>
+                                        <span>{{ number_format($codFee) }}円</span>
+                                    </div>
+                                    @endif
                                 </div>
                                 
                                 <div class="border-t border-gray-200 dark:border-gray-600 pt-4 mb-6">
@@ -149,7 +251,7 @@
                                         <a href="{{ route('checkout.address') }}" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150 mr-4">
                                             戻る
                                         </a>
-                                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-green-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 dark:hover:bg-gray-800 focus:bg-green-700 dark:focus:bg-gray-800 active:bg-green-800 dark:active:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 w-full justify-center">
+                                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-green-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 dark:hover:bg-gray-800 focus:bg-green-700 dark:focus:bg-gray-800 active:bg-green-800 dark:active:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 justify-center">
                                             注文を確定する
                                         </button>
                                     </div>

@@ -17,27 +17,32 @@
                     
                     <!-- カテゴリフィルター -->
                     <div>
-                        <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">カテゴリー</label>
-                        <select name="category" id="category" 
+                        <label for="category_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">カテゴリー</label>
+                        <select name="category_id" id="category_id" 
                             class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                             <option value="">すべてのカテゴリー</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
                                     {{ $category->name }}
                                 </option>
+                                @foreach($category->children as $child)
+                                    <option value="{{ $child->id }}" {{ request('category_id') == $child->id ? 'selected' : '' }}>
+                                        　 {{ $child->name }}
+                                    </option>
+                                @endforeach
                             @endforeach
                         </select>
                     </div>
                     
                     <!-- 在庫フィルター -->
                     <div>
-                        <label for="stock" class="block text-sm font-medium text-gray-700 dark:text-gray-300">在庫状況</label>
-                        <select name="stock" id="stock" 
+                        <label for="stock_status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">在庫状況</label>
+                        <select name="stock_status" id="stock_status" 
                             class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                             <option value="">すべての商品</option>
-                            <option value="in_stock" {{ request('stock') == 'in_stock' ? 'selected' : '' }}>在庫あり</option>
-                            <option value="out_of_stock" {{ request('stock') == 'out_of_stock' ? 'selected' : '' }}>在庫切れ</option>
-                            <option value="low_stock" {{ request('stock') == 'low_stock' ? 'selected' : '' }}>残りわずか</option>
+                            <option value="in_stock" {{ request('stock_status') == 'in_stock' ? 'selected' : '' }}>在庫あり</option>
+                            <option value="out_of_stock" {{ request('stock_status') == 'out_of_stock' ? 'selected' : '' }}>在庫切れ</option>
+                            <option value="low_stock" {{ request('stock_status') == 'low_stock' ? 'selected' : '' }}>残りわずか</option>
                         </select>
                     </div>
                     
@@ -58,7 +63,7 @@
                         検索・フィルター
                     </button>
                     
-                    @if(request('search') || request('category') || request('stock') || request('visibility'))
+                    @if(request('search') || request('category_id') || request('stock_status') || request('visibility'))
                         <a href="{{ route('admin.products.index') }}" class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300">
                             フィルターをクリア
                         </a>
@@ -109,12 +114,12 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-10 w-10">
-                                    @if($product->mainImage && $product->mainImage->image_path)
+                                    @if($product->mainImage && $product->mainImage->image_path && Storage::disk('public')->exists($product->mainImage->image_path))
                                         <img class="h-10 w-10 rounded-full object-cover" src="{{ Storage::url($product->mainImage->image_path) }}" alt="{{ $product->name }}">
                                     @else
                                         <div class="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                                             <svg class="h-6 w-6 text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" />
                                             </svg>
                                         </div>
                                     @endif
@@ -182,6 +187,28 @@
                             <form action="{{ route('admin.products.destroy', $product) }}" method="POST" class="inline-block">
                                 @csrf
                                 @method('DELETE')
+                                <!-- 検索・フィルターパラメータを保持 -->
+                                @if(request('search'))
+                                    <input type="hidden" name="search" value="{{ request('search') }}">
+                                @endif
+                                @if(request('category_id'))
+                                    <input type="hidden" name="category_id" value="{{ request('category_id') }}">
+                                @endif
+                                @if(request('stock_status'))
+                                    <input type="hidden" name="stock_status" value="{{ request('stock_status') }}">
+                                @endif
+                                @if(request('visibility'))
+                                    <input type="hidden" name="visibility" value="{{ request('visibility') }}">
+                                @endif
+                                @if(request('sort'))
+                                    <input type="hidden" name="sort" value="{{ request('sort') }}">
+                                @endif
+                                @if(request('direction'))
+                                    <input type="hidden" name="direction" value="{{ request('direction') }}">
+                                @endif
+                                @if(request('page'))
+                                    <input type="hidden" name="page" value="{{ request('page') }}">
+                                @endif
                                 <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" 
                                     onclick="return confirm('本当にこの商品を削除しますか？この操作は元に戻せません。')">
                                     削除

@@ -48,14 +48,14 @@ class ShippingAddressController extends Controller
             'address_line1' => 'required|string|max:255',
             'address_line2' => 'nullable|string|max:255',
             'phone' => 'required|string|max:20',
-            'is_default' => 'boolean',
+            'is_default' => 'required|in:0,1',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $isDefault = $request->has('is_default');
+        $isDefault = (bool) $request->input('is_default');
         
         // もしデフォルトに設定する場合は、他のアドレスをデフォルトから外す
         if ($isDefault) {
@@ -73,7 +73,10 @@ class ShippingAddressController extends Controller
         $address->is_default = $isDefault;
         $address->save();
 
-        return redirect()->route('shipping_addresses.index')
+        // チェックアウト処理中かどうかを判定
+        $redirectTo = $this->getRedirectAfterStore($request);
+
+        return redirect()->to($redirectTo)
             ->with('success', '配送先住所を登録しました。');
     }
 
@@ -109,14 +112,14 @@ class ShippingAddressController extends Controller
             'address_line1' => 'required|string|max:255',
             'address_line2' => 'nullable|string|max:255',
             'phone' => 'required|string|max:20',
-            'is_default' => 'boolean',
+            'is_default' => 'required|in:0,1',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $isDefault = $request->has('is_default');
+        $isDefault = (bool) $request->input('is_default');
         
         // もしデフォルトに設定する場合は、他のアドレスをデフォルトから外す
         if ($isDefault && !$shippingAddress->is_default) {
@@ -180,5 +183,36 @@ class ShippingAddressController extends Controller
 
         return redirect()->route('shipping_addresses.index')
             ->with('success', 'デフォルト配送先を変更しました。');
+    }
+
+    /**
+     * 住所登録後のリダイレクト先を決定
+     */
+    private function getRedirectAfterStore(Request $request)
+    {
+        // チェックアウト処理中かどうかを判定
+        // 1. リファラーURLがチェックアウト関連の場合
+        $referer = $request->header('referer');
+        if ($referer && (
+            str_contains($referer, '/checkout/') || 
+            str_contains($referer, 'checkout')
+        )) {
+            return route('checkout.address');
+        }
+
+        // 2. クエリパラメータでチェックアウト中を示している場合
+        if ($request->has('from_checkout') || $request->input('redirect') === 'checkout') {
+            return route('checkout.address');
+        }
+
+        // 3. セッションにチェックアウト情報がある場合
+        if (session()->has('checkout.shipping_address_id') || 
+            session()->has('checkout.payment_method') ||
+            session()->has('checkout.shipping_company_id')) {
+            return route('checkout.address');
+        }
+
+        // デフォルトは住所一覧ページ
+        return route('shipping_addresses.index');
     }
 }

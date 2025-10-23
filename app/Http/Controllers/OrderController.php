@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
@@ -23,7 +24,37 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Auth::user()->orders()->orderBy('created_at', 'desc')->get();
-        return view('orders.index', compact('orders'));
+        
+        // ステータスの日本語表示用配列
+        $orderStatuses = [
+            'pending' => '未処理',
+            'processing' => '処理中',
+            'shipped' => '発送済み',
+            'delivered' => '配達済み',
+            'completed' => '完了',
+            'cancelled' => 'キャンセル',
+        ];
+        
+        $paymentStatuses = [
+            'pending' => '未払い',
+            'paid' => '支払い済み',
+            'failed' => '失敗',
+            'refunded' => '返金済み',
+        ];
+        
+        $paymentMethods = [
+            'stripe' => 'クレジットカード',
+            'bank_transfer' => '銀行振込',
+            'cash_on_delivery' => '代金引換',
+        ];
+        
+        $bankTransferStatuses = [
+            'pending' => '振込待ち',
+            'confirmed' => '確認済み',
+            'expired' => '期限切れ',
+        ];
+        
+        return view('orders.index', compact('orders', 'orderStatuses', 'paymentStatuses', 'paymentMethods', 'bankTransferStatuses'));
     }
 
     /**
@@ -36,7 +67,39 @@ class OrderController extends Controller
             abort(403);
         }
 
-        return view('orders.show', compact('order'));
+        // 必要なリレーションをロード
+        $order->load(['bankTransfer', 'items.product', 'shippingAddress']);
+
+        // ステータスの日本語表示用配列
+        $orderStatuses = [
+            'pending' => '未処理',
+            'processing' => '処理中',
+            'shipped' => '発送済み',
+            'delivered' => '配達済み',
+            'completed' => '完了',
+            'cancelled' => 'キャンセル',
+        ];
+        
+        $paymentStatuses = [
+            'pending' => '未払い',
+            'paid' => '支払い済み',
+            'failed' => '失敗',
+            'refunded' => '返金済み',
+        ];
+        
+        $paymentMethods = [
+            'stripe' => 'クレジットカード',
+            'bank_transfer' => '銀行振込',
+            'cash_on_delivery' => '代金引換',
+        ];
+        
+        $bankTransferStatuses = [
+            'pending' => '振込待ち',
+            'confirmed' => '確認済み',
+            'expired' => '期限切れ',
+        ];
+
+        return view('orders.show', compact('order', 'orderStatuses', 'paymentStatuses', 'paymentMethods', 'bankTransferStatuses'));
     }
 
     /**
@@ -72,9 +135,48 @@ class OrderController extends Controller
             abort(403);
         }
 
-        $pdf = PDF::loadView('orders.invoice', compact('order'));
-        
-        return $pdf->download('invoice-' . $order->order_number . '.pdf');
+        try {
+            Log::info('請求書PDF生成開始', ['order_id' => $order->id]);
+            
+            // 必要なリレーションをロード
+            $order->load(['items.product', 'shippingAddress']);
+            
+            Log::info('DOMPDFの設定確認', [
+                'default_font' => config('dompdf.options.default_font'),
+                'font_dir' => config('dompdf.options.font_dir'),
+                'enable_font_subsetting' => config('dompdf.options.enable_font_subsetting')
+            ]);
+            
+            // フォントファイルの存在確認
+            $fontPath = storage_path('fonts/ipag.ttf');
+            Log::info('フォントファイル確認', [
+                'font_path' => $fontPath,
+                'exists' => file_exists($fontPath),
+                'readable' => is_readable($fontPath)
+            ]);
+            
+            // 文字コードをUTF-8に統一（記事の推奨事項）
+            $orderData = $this->convertToUtf8($order->toArray());
+            
+            $pdf = PDF::loadView('orders.invoice', ['order' => $order])
+                        ->set_option('compress', 1)
+                        ->set_option('defaultFont', 'NotoSansJP')
+                        ->setPaper('a4', 'portrait'); // 縦A4サイズに指定
+            
+            Log::info('請求書PDF生成成功', ['order_id' => $order->id]);
+            return $pdf->download('invoice-' . $order->order_number . '.pdf');
+            
+        } catch (\Exception $e) {
+            // エラーが出たらログに残しておく
+            Log::error('請求書PDFでエラーが発生しました', [
+                'order_id' => $order->id,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return redirect()->route('orders.show', $order)
+                ->with('error', '請求書の生成に失敗しました。詳細: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -93,8 +195,53 @@ class OrderController extends Controller
                 ->with('error', '支払いが完了していないため、領収書を発行できません。');
         }
 
-        $pdf = PDF::loadView('orders.receipt', compact('order'));
+        try {
+            Log::info('領収書PDF生成開始', ['order_id' => $order->id]);
+            
+            // 必要なリレーションをロード
+            $order->load(['items.product', 'shippingAddress']);
+            
+            // 文字コードをUTF-8に統一（記事の推奨事項）
+            $orderData = $this->convertToUtf8($order->toArray());
+            
+            $pdf = PDF::loadView('orders.receipt', ['order' => $order])
+                        ->set_option('compress', 1)
+                        ->set_option('defaultFont', 'NotoSansJP')
+                        ->setPaper('a4', 'portrait'); // 縦A4サイズに指定
+            
+            Log::info('領収書PDF生成成功', ['order_id' => $order->id]);
+            return $pdf->download('receipt-' . $order->order_number . '.pdf');
+            
+        } catch (\Exception $e) {
+            // エラーが出たらログに残しておく
+            Log::error('領収書PDFでエラーが発生しました', [
+                'order_id' => $order->id,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return redirect()->route('orders.show', $order)
+                ->with('error', '領収書の生成に失敗しました。詳細: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * 文字コードをUTF-8に統一する（記事の推奨事項）
+     */
+    private function convertToUtf8($data)
+    {
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                $data[$key] = $this->convertToUtf8($value);
+            }
+        } elseif (is_string($data)) {
+            return mb_convert_encoding(
+                $data,
+                'UTF-8',
+                'ASCII,JIS,UTF-8,EUC-JP,SJIS'
+            );
+        }
         
-        return $pdf->download('receipt-' . $order->order_number . '.pdf');
+        return $data;
     }
 }

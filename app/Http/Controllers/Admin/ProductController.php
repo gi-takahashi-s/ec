@@ -39,7 +39,19 @@ class ProductController extends Controller
         
         // カテゴリーフィルタリング
         if ($request->has('category_id') && $request->input('category_id') != '') {
-            $query->where('category_id', $request->input('category_id'));
+            $categoryId = $request->input('category_id');
+            $category = Category::find($categoryId);
+            
+            if ($category) {
+                // 選択されたカテゴリーが親カテゴリーの場合、子カテゴリーも含める
+                $categoryIds = [$categoryId];
+                if ($category->children()->exists()) {
+                    $categoryIds = array_merge($categoryIds, $category->children()->pluck('id')->toArray());
+                }
+                $query->whereIn('category_id', $categoryIds);
+            } else {
+                $query->where('category_id', $categoryId);
+            }
         }
         
         // 在庫状態フィルタリング
@@ -70,7 +82,7 @@ class ProductController extends Controller
         $query->orderBy($sortField, $sortDirection);
         
         $products = $query->paginate(15);
-        $categories = Category::all();
+        $categories = Category::with('children')->whereNull('parent_id')->orderBy('sort_order')->get();
         
         return view('admin.products.index', compact('products', 'categories'));
     }
@@ -80,7 +92,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $categories = Category::all();
+        $categories = Category::with('children')->whereNull('parent_id')->orderBy('sort_order')->get();
         return view('admin.products.create', compact('categories'));
     }
 
@@ -92,13 +104,13 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|max:255',
             'description' => 'required',
-            'price' => 'required|numeric|min:0',
-            'sale_price' => 'nullable|numeric|min:0',
+            'price' => 'required|integer|min:0',
+            'sale_price' => 'nullable|integer|min:0',
             'stock' => 'required|integer|min:0',
             'sku' => 'required|unique:products,sku',
             'category_id' => 'required|exists:categories,id',
-            'main_image' => 'required|image|max:2048',
-            'additional_images.*' => 'nullable|image|max:2048',
+            'main_image_data' => 'required|string',
+            'additional_images_data' => 'nullable|string',
         ]);
         
         // スラグの作成
@@ -128,8 +140,8 @@ class ProductController extends Controller
         ]);
         
         // メイン画像の保存
-        if ($request->hasFile('main_image')) {
-            $path = $request->file('main_image')->store('products', 'public');
+        if ($request->filled('main_image_data')) {
+            $path = $this->saveBase64Image($request->main_image_data, 'products');
             
             ProductImage::create([
                 'product_id' => $product->id,
@@ -139,19 +151,26 @@ class ProductController extends Controller
         }
         
         // 追加画像の保存
-        if ($request->hasFile('additional_images')) {
-            foreach ($request->file('additional_images') as $image) {
-                $path = $image->store('products', 'public');
-                
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image_path' => $path,
-                    'is_main' => false,
-                ]);
+        if ($request->filled('additional_images_data')) {
+            $additionalImages = json_decode($request->additional_images_data, true);
+            
+            if (is_array($additionalImages)) {
+                foreach ($additionalImages as $imageData) {
+                    $path = $this->saveBase64Image($imageData, 'products');
+                    
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'image_path' => $path,
+                        'is_main' => false,
+                    ]);
+                }
             }
         }
         
-        return redirect()->route('admin.products.index')
+        // 検索・フィルターパラメータを保持してリダイレクト
+        $queryParams = $request->only(['search', 'category_id', 'stock_status', 'visibility', 'sort', 'direction', 'page']);
+        
+        return redirect()->route('admin.products.index', $queryParams)
             ->with('success', '商品を作成しました。');
     }
 
@@ -170,7 +189,7 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $product->load(['category', 'images']);
-        $categories = Category::all();
+        $categories = Category::with('children')->whereNull('parent_id')->orderBy('sort_order')->get();
         return view('admin.products.edit', compact('product', 'categories'));
     }
 
@@ -182,13 +201,14 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|max:255',
             'description' => 'required',
-            'price' => 'required|numeric|min:0',
-            'sale_price' => 'nullable|numeric|min:0',
+            'price' => 'required|integer|min:0',
+            'sale_price' => 'nullable|integer|min:0',
             'stock' => 'required|integer|min:0',
             'sku' => 'required|unique:products,sku,' . $product->id,
             'category_id' => 'required|exists:categories,id',
-            'main_image' => 'nullable|image|max:2048',
-            'additional_images.*' => 'nullable|image|max:2048',
+            'main_image_data' => 'nullable|string',
+            'additional_images_data' => 'nullable|string',
+            'existing_images_order' => 'nullable|string',
         ]);
         
         // 商品データの更新
@@ -206,13 +226,45 @@ class ProductController extends Controller
             'category_id' => $request->category_id,
         ]);
         
-        // メイン画像の更新
-        if ($request->hasFile('main_image')) {
+        // 既存画像の削除処理
+        $existingImages = $product->images;
+        foreach ($existingImages as $image) {
+            $fieldName = 'existing_image_' . $image->id;
+            if ($request->input($fieldName) === 'delete') {
+                // ストレージから画像を削除
+                if (Storage::disk('public')->exists($image->image_path)) {
+                    Storage::disk('public')->delete($image->image_path);
+                }
+                // データベースから削除
+                $image->delete();
+            }
+        }
+        
+        // 既存画像の順序更新
+        if ($request->filled('existing_images_order')) {
+            $existingOrder = json_decode($request->existing_images_order, true);
+            
+            if (is_array($existingOrder)) {
+                // 全ての既存画像をいったん非メインに設定
+                $product->images()->update(['is_main' => false]);
+                
+                foreach ($existingOrder as $orderData) {
+                    $product->images()
+                        ->where('id', $orderData['id'])
+                        ->update([
+                            'is_main' => $orderData['isMain'] ?? false
+                        ]);
+                }
+            }
+        }
+        
+        // 新しいメイン画像の保存
+        if ($request->filled('main_image_data')) {
             // 既存のメイン画像を非メインに変更
-            $product->images()->where('is_main', true)->update(['is_main' => false]);
+            $product->images()->update(['is_main' => false]);
             
             // 新しいメイン画像を保存
-            $path = $request->file('main_image')->store('products', 'public');
+            $path = $this->saveBase64Image($request->main_image_data, 'products');
             
             ProductImage::create([
                 'product_id' => $product->id,
@@ -221,48 +273,34 @@ class ProductController extends Controller
             ]);
         }
         
-        // 追加画像の保存
-        if ($request->hasFile('additional_images')) {
-            foreach ($request->file('additional_images') as $image) {
-                $path = $image->store('products', 'public');
-                
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image_path' => $path,
-                    'is_main' => false,
-                ]);
-            }
-        }
-        
-        // 削除する画像の処理
-        if ($request->has('delete_images')) {
-            $deleteImages = $request->input('delete_images');
-            $productImages = ProductImage::whereIn('id', $deleteImages)->get();
+        // 新しい追加画像の保存
+        if ($request->filled('additional_images_data')) {
+            $additionalImages = json_decode($request->additional_images_data, true);
             
-            foreach ($productImages as $image) {
-                // メイン画像は削除しない（少なくとも1つは必要）
-                if ($image->is_main && $product->images()->where('is_main', true)->count() <= 1) {
-                    continue;
+            if (is_array($additionalImages)) {
+                foreach ($additionalImages as $imageData) {
+                    $path = $this->saveBase64Image($imageData, 'products');
+                    
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'image_path' => $path,
+                        'is_main' => false,
+                    ]);
                 }
-                
-                // ストレージから画像を削除
-                if (Storage::disk('public')->exists($image->image_path)) {
-                    Storage::disk('public')->delete($image->image_path);
-                }
-                
-                // データベースから削除
-                $image->delete();
             }
         }
         
-        return redirect()->route('admin.products.index')
+        // 検索・フィルターパラメータを保持してリダイレクト
+        $queryParams = $request->only(['search', 'category_id', 'stock_status', 'visibility', 'sort', 'direction', 'page']);
+        
+        return redirect()->route('admin.products.index', $queryParams)
             ->with('success', '商品を更新しました。');
     }
 
     /**
      * 商品を削除
      */
-    public function destroy(Product $product)
+    public function destroy(Request $request, Product $product)
     {
         // 商品に関連する画像を削除
         foreach ($product->images as $image) {
@@ -274,7 +312,29 @@ class ProductController extends Controller
         // 商品を削除
         $product->delete();
         
-        return redirect()->route('admin.products.index')
+        // 検索・フィルターパラメータを保持してリダイレクト
+        $queryParams = $request->only(['search', 'category_id', 'stock_status', 'visibility', 'sort', 'direction', 'page']);
+        
+        return redirect()->route('admin.products.index', $queryParams)
             ->with('success', '商品を削除しました。');
+    }
+
+    /**
+     * Base64画像データをファイルとして保存
+     */
+    private function saveBase64Image($base64Data, $directory)
+    {
+        // data:image/jpeg;base64, の部分を除去
+        $imageData = preg_replace('/^data:image\/\w+;base64,/', '', $base64Data);
+        $imageData = base64_decode($imageData);
+        
+        // ファイル名を生成
+        $fileName = uniqid() . '.jpg';
+        $filePath = $directory . '/' . $fileName;
+        
+        // ストレージに保存
+        Storage::disk('public')->put($filePath, $imageData);
+        
+        return $filePath;
     }
 }

@@ -1,3 +1,7 @@
+@php
+    use Illuminate\Support\Facades\Storage;
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -5,7 +9,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 px-4">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- フィルターと検索 -->
             <div class="mb-8 bg-white p-4 rounded-lg shadow">
@@ -18,6 +22,11 @@
                                 <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
                                     {{ $category->name }}
                                 </option>
+                                @foreach($category->children as $child)
+                                    <option value="{{ $child->id }}" {{ request('category') == $child->id ? 'selected' : '' }}>
+                                        　 {{ $child->name }}
+                                    </option>
+                                @endforeach
                             @endforeach
                         </select>
                     </div>
@@ -46,8 +55,19 @@
             <!-- 検索結果 -->
             <div class="mb-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-2">
-                    @if(request('search'))
+                    @php
+                        $selectedCategory = null;
+                        if(request('category')) {
+                            $selectedCategory = $categories->flatten()->firstWhere('id', request('category'));
+                        }
+                    @endphp
+                    
+                    @if(request('search') && $selectedCategory)
+                        「{{ request('search') }}」の検索結果（{{ $selectedCategory->name }}カテゴリー） - {{ $products->total() }}件
+                    @elseif(request('search'))
                         「{{ request('search') }}」の検索結果 - {{ $products->total() }}件
+                    @elseif($selectedCategory)
+                        {{ $selectedCategory->name }}カテゴリーの商品 - {{ $products->total() }}件
                     @else
                         全{{ $products->total() }}件の商品
                     @endif

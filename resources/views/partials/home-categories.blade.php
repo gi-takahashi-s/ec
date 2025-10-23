@@ -8,7 +8,7 @@
         @foreach($categories as $category)
             <a href="{{ route('categories.show', $category->slug) }}" class="block group">
                 <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 group-hover:shadow-md transition-shadow duration-300">
-                    <div class="h-40 bg-gray-100 overflow-hidden">
+                    <div class="aspect-w-16 aspect-h-9 bg-gray-100 overflow-hidden">
                         <img src="{{ $category->image_path ? Storage::url($category->image_path) : asset('images/no-category-image.png') }}" 
                             alt="{{ $category->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                     </div>

@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 px-4">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
@@ -57,55 +57,102 @@
                         <p class="text-gray-600 dark:text-gray-300">注文内容の確認メールを送信しました。</p>
                     </div>
 
-                    <!-- 注文詳細 -->
+                    <!-- 銀行振込の場合の振込先情報 -->
+                    @if($order->isBankTransfer() && $order->bankTransfer)
+                        @php
+                            // 管理画面で設定した最新の銀行振込情報を取得
+                            $paymentMethod = \App\Models\PaymentMethod::where('key', \App\Models\PaymentMethod::BANK_TRANSFER)->first();
+                            $settings = $paymentMethod ? $paymentMethod->settings : [];
+                            
+                            // 管理画面の設定がある場合は優先、なければbankTransferの情報を使用
+                            $bankInfo = [
+                                'bank_name' => $settings['bank_name'] ?? $order->bankTransfer->bank_name,
+                                'branch_name' => $settings['bank_branch'] ?? $order->bankTransfer->branch_name,
+                                'account_type' => $settings['account_type'] ?? $order->bankTransfer->account_type,
+                                'account_number' => $settings['account_number'] ?? $order->bankTransfer->account_number,
+                                'account_holder' => $settings['account_name'] ?? $order->bankTransfer->account_holder,
+                                'transfer_amount' => $order->bankTransfer->transfer_amount,
+                                'transfer_deadline' => $order->bankTransfer->transfer_deadline,
+                            ];
+                        @endphp
+                        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 mb-8">
+                            <div class="flex items-start">
+                                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                                <div class="flex-1">
+                                    <h4 class="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-3">お振込先情報</h4>
+                                    <div class="bg-white dark:bg-gray-800 rounded-md p-4 border border-blue-200 dark:border-blue-700">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400">銀行名</p>
+                                                <p class="font-semibold">{{ $bankInfo['bank_name'] }}</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400">支店名</p>
+                                                <p class="font-semibold">{{ $bankInfo['branch_name'] }}</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400">口座種別</p>
+                                                <p class="font-semibold">{{ $bankInfo['account_type'] }}</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400">口座番号</p>
+                                                <p class="font-semibold">{{ $bankInfo['account_number'] }}</p>
+                                            </div>
+                                            <div class="md:col-span-2">
+                                                <p class="text-sm text-gray-600 dark:text-gray-400">口座名義</p>
+                                                <p class="font-semibold">{{ $bankInfo['account_holder'] }}</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400">振込金額</p>
+                                                <p class="font-bold text-lg text-blue-600 dark:text-blue-400">{{ number_format($bankInfo['transfer_amount']) }}円</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400">振込期限</p>
+                                                <p class="font-semibold text-orange-600 dark:text-orange-400">{{ $bankInfo['transfer_deadline']->format('Y年m月d日') }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-md">
+                                        <div class="flex items-start">
+                                            <svg class="w-5 h-5 text-orange-600 dark:text-orange-400 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                            </svg>
+                                            <div class="text-sm text-orange-800 dark:text-orange-200">
+                                                <p class="font-medium mb-1">重要なお知らせ</p>
+                                                @if(!empty($settings['notes']))
+                                                    <div class="text-xs whitespace-pre-line">{{ $settings['notes'] }}</div>
+                                                @else
+                                                    <ul class="space-y-1 text-xs">
+                                                        <li>• 振込期限内にお振込みをお願いいたします</li>
+                                                        <li>• 振込手数料はお客様負担となります</li>
+                                                        <li>• 振込確認後、商品を発送いたします</li>
+                                                        <li>• 振込名義は注文者名と同一にしてください</li>
+                                                    </ul>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- 配送先住所 -->
                     <div class="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600 mb-8">
                         <div class="p-4 border-b border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
-                            <h4 class="text-lg font-semibold">注文情報</h4>
+                            <h4 class="text-lg font-semibold">配送先住所</h4>
                         </div>
                         <div class="p-4">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <h5 class="font-semibold mb-2">注文情報</h5>
-                                    <p>注文日時: {{ $order->created_at->format('Y年m月d日 H:i') }}</p>
-                                    <p>注文状況: 
-                                        <span class="px-2 py-1 text-xs rounded-full 
-                                            @if($order->order_status == 'pending') bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100
-                                            @elseif($order->order_status == 'processing') bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100
-                                            @elseif($order->order_status == 'completed') bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
-                                            @elseif($order->order_status == 'cancelled') bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100
-                                            @endif">
-                                            @if($order->order_status == 'pending') 処理待ち
-                                            @elseif($order->order_status == 'processing') 処理中
-                                            @elseif($order->order_status == 'completed') 完了
-                                            @elseif($order->order_status == 'cancelled') キャンセル
-                                            @else {{ $order->order_status }}
-                                            @endif
-                                        </span>
-                                    </p>
-                                    <p>支払い状況: 
-                                        <span class="px-2 py-1 text-xs rounded-full 
-                                            @if($order->payment_status == 'pending') bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100
-                                            @elseif($order->payment_status == 'paid') bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
-                                            @elseif($order->payment_status == 'failed') bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100
-                                            @endif">
-                                            @if($order->payment_status == 'pending') 未払い
-                                            @elseif($order->payment_status == 'paid') 支払い済み
-                                            @elseif($order->payment_status == 'failed') 失敗
-                                            @else {{ $order->payment_status }}
-                                            @endif
-                                        </span>
-                                    </p>
-                                </div>
-                                <div>
-                                    <h5 class="font-semibold mb-2">配送先住所</h5>
-                                    <p>{{ $order->shippingAddress->full_name }}</p>
-                                    <p>〒{{ $order->shippingAddress->postal_code }}</p>
-                                    <p>{{ $order->shippingAddress->prefecture }}{{ $order->shippingAddress->city }}{{ $order->shippingAddress->address_line1 }}</p>
-                                    @if ($order->shippingAddress->address_line2)
-                                        <p>{{ $order->shippingAddress->address_line2 }}</p>
-                                    @endif
-                                    <p>電話番号: {{ $order->shippingAddress->phone }}</p>
-                                </div>
+                            <div class="space-y-2">
+                                <p class="font-semibold">{{ $order->shippingAddress->full_name }}</p>
+                                <p>〒{{ $order->shippingAddress->postal_code }}</p>
+                                <p>{{ $order->shippingAddress->prefecture }}{{ $order->shippingAddress->city }}{{ $order->shippingAddress->address_line1 }}</p>
+                                @if ($order->shippingAddress->address_line2)
+                                    <p>{{ $order->shippingAddress->address_line2 }}</p>
+                                @endif
+                                <p>電話番号: {{ $order->shippingAddress->phone }}</p>
                             </div>
                         </div>
                     </div>

@@ -18,10 +18,10 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('shipping_address_id')->nullable()->constrained()->nullOnDelete();
             $table->string('order_number')->unique();
-            $table->decimal('subtotal', 10, 2);
-            $table->decimal('tax', 10, 2);
-            $table->decimal('shipping_fee', 10, 2)->default(0);
-            $table->decimal('total', 10, 2);
+            $table->integer('subtotal');
+            $table->integer('tax');
+            $table->integer('shipping_fee')->default(0);
+            $table->integer('total');
             $table->string('payment_method')->default('stripe');
             $table->string('payment_status')->default('pending');
             $table->string('stripe_payment_id')->nullable();

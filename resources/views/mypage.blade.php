@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 px-4">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
@@ -47,6 +47,16 @@
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">最近の注文</h3>
                     
                     @if(Auth::user()->orders->count() > 0)
+                        @php
+                            $orderStatuses = [
+                                'pending' => '未処理',
+                                'processing' => '処理中',
+                                'shipped' => '発送済み',
+                                'delivered' => '配達済み',
+                                'completed' => '完了',
+                                'cancelled' => 'キャンセル',
+                            ];
+                        @endphp
                         <div class="overflow-x-auto">
                             <table class="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                                 <thead>
@@ -68,15 +78,13 @@
                                                 <span class="px-2 py-1 text-xs rounded-full 
                                                     @if($order->order_status == 'pending') bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100
                                                     @elseif($order->order_status == 'processing') bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100
+                                                    @elseif($order->order_status == 'shipped') bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100
+                                                    @elseif($order->order_status == 'delivered') bg-indigo-100 text-indigo-800 dark:bg-indigo-800 dark:text-indigo-100
                                                     @elseif($order->order_status == 'completed') bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
                                                     @elseif($order->order_status == 'cancelled') bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100
+                                                    @else bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100
                                                     @endif">
-                                                    @if($order->order_status == 'pending') 処理待ち
-                                                    @elseif($order->order_status == 'processing') 処理中
-                                                    @elseif($order->order_status == 'completed') 完了
-                                                    @elseif($order->order_status == 'cancelled') キャンセル
-                                                    @else {{ $order->order_status }}
-                                                    @endif
+                                                    {{ $orderStatuses[$order->order_status] ?? $order->order_status }}
                                                 </span>
                                             </td>
                                             <td class="py-4 px-6 text-sm">

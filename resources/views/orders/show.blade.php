@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 px-4">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
@@ -45,15 +45,13 @@
                                 <span class="px-2 py-1 text-xs rounded-full 
                                     @if($order->order_status == 'pending') bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100
                                     @elseif($order->order_status == 'processing') bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100
+                                    @elseif($order->order_status == 'shipped') bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100
+                                    @elseif($order->order_status == 'delivered') bg-indigo-100 text-indigo-800 dark:bg-indigo-800 dark:text-indigo-100
                                     @elseif($order->order_status == 'completed') bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
                                     @elseif($order->order_status == 'cancelled') bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100
+                                    @else bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100
                                     @endif">
-                                    @if($order->order_status == 'pending') 処理待ち
-                                    @elseif($order->order_status == 'processing') 処理中
-                                    @elseif($order->order_status == 'completed') 完了
-                                    @elseif($order->order_status == 'cancelled') キャンセル
-                                    @else {{ $order->order_status }}
-                                    @endif
+                                    {{ $orderStatuses[$order->order_status] ?? $order->order_status }}
                                 </span>
                             </span>
                             
@@ -134,22 +132,47 @@
                             <!-- 支払い情報 -->
                             <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-4">
                                 <h4 class="font-semibold mb-2">支払い情報</h4>
-                                <p>支払い方法: クレジットカード（Stripe）</p>
+                                <p>支払い方法: {{ $paymentMethods[$order->payment_method] ?? $order->payment_method }}</p>
                                 <p>支払い状況: 
                                     <span class="px-2 py-1 text-xs rounded-full 
                                         @if($order->payment_status == 'pending') bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100
                                         @elseif($order->payment_status == 'paid') bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
                                         @elseif($order->payment_status == 'failed') bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100
+                                        @elseif($order->payment_status == 'refunded') bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100
+                                        @else bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100
                                         @endif">
-                                        @if($order->payment_status == 'pending') 未払い
-                                        @elseif($order->payment_status == 'paid') 支払い済み
-                                        @elseif($order->payment_status == 'failed') 失敗
-                                        @else {{ $order->payment_status }}
-                                        @endif
+                                        {{ $paymentStatuses[$order->payment_status] ?? $order->payment_status }}
                                     </span>
                                 </p>
                                 @if($order->paid_at)
                                     <p>支払い日時: {{ $order->paid_at->format('Y年m月d日 H:i') }}</p>
+                                @endif
+                                
+                                @if($order->payment_method === 'bank_transfer' && $order->bankTransfer)
+                                    <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900 rounded">
+                                        <h5 class="font-medium text-blue-900 dark:text-blue-100 mb-2">銀行振込情報</h5>
+                                        <p class="text-sm text-blue-800 dark:text-blue-200">
+                                            振込状況: 
+                                            <span class="px-2 py-1 text-xs rounded-full 
+                                                @if($order->bankTransfer->transfer_status === 'pending') bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100
+                                                @elseif($order->bankTransfer->transfer_status === 'confirmed') bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
+                                                @elseif($order->bankTransfer->transfer_status === 'expired') bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100
+                                                @else bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100
+                                                @endif">
+                                                {{ $bankTransferStatuses[$order->bankTransfer->transfer_status] ?? $order->bankTransfer->transfer_status }}
+                                            </span>
+                                        </p>
+                                        @if($order->bankTransfer->transfer_deadline)
+                                            <p class="text-sm text-blue-800 dark:text-blue-200">
+                                                振込期限: {{ $order->bankTransfer->transfer_deadline->format('Y年m月d日') }}
+                                            </p>
+                                        @endif
+                                        @if($order->bankTransfer->transfer_confirmed_at)
+                                            <p class="text-sm text-blue-800 dark:text-blue-200">
+                                                振込確認日時: {{ $order->bankTransfer->transfer_confirmed_at->format('Y年m月d日 H:i') }}
+                                            </p>
+                                        @endif
+                                    </div>
                                 @endif
                                 
                                 <div class="mt-3 flex flex-wrap gap-2">

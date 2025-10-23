@@ -1,72 +1,105 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="UTF-8">
     <title>領収書 #{{ $order->order_number }}</title>
     <style>
+        /* Noto Sans JP フォントの設定 */
+        @font-face {
+            font-family: 'NotoSansJP';
+            src: url('{{ storage_path('fonts/NotoSansJP-Regular.ttf') }}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
         body {
-            font-family: ipag, sans-serif;
+            font-family: 'NotoSansJP', 'DejaVu Sans', sans-serif;
+        }
+        
+        * {
+            font-family: 'NotoSansJP', 'DejaVu Sans', sans-serif;
+        }
+        
+        body {
+            padding-top: 5mm;
+            width: 190mm;
+            height: 297mm;
+            margin-left: auto;
+            margin-right: auto;
             font-size: 12px;
             line-height: 1.4;
-            margin: 0;
-            padding: 0;
         }
+        
         .container {
             width: 100%;
             margin: 0 auto;
             padding: 20px;
         }
+        
         .header {
             text-align: center;
             margin-bottom: 30px;
         }
+        
         .company-info {
             margin-bottom: 20px;
         }
+        
         .document-title {
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 10px;
             text-align: center;
         }
+        
         .receipt-details {
             margin-bottom: 20px;
         }
+        
         .customer-info {
             margin-bottom: 20px;
         }
+        
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
         }
+        
         th, td {
-            border: 1px solid #ddd;
+            border: 1px solid #000;
             padding: 8px;
             text-align: left;
         }
+        
         th {
             background-color: #f2f2f2;
+            font-weight: normal;
         }
+        
         .text-right {
             text-align: right;
         }
+        
         .totals {
             width: 300px;
             float: right;
             margin-bottom: 30px;
         }
+        
         .receipt-box {
             border: 2px solid #000;
             padding: 10px;
             margin-bottom: 20px;
             text-align: center;
         }
+        
         .receipt-amount {
             font-size: 18px;
             font-weight: bold;
             margin: 10px 0;
         }
+        
         .stamp-area {
             border: 1px dashed #999;
             width: 100px;
@@ -75,12 +108,20 @@
             text-align: center;
             line-height: 100px;
         }
+        
         .footer {
             margin-top: 50px;
             text-align: center;
             font-size: 10px;
         }
+        
         .clearfix {
+            clear: both;
+        }
+        
+        .clearfix:after {
+            content: "";
+            display: table;
             clear: both;
         }
     </style>

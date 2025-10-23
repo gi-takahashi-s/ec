@@ -34,8 +34,13 @@ class ReportController extends Controller
             ? Carbon::parse($request->input('end_date')) 
             : Carbon::now();
         
-        // 期間が30日以上の場合は日単位、それ以外は日単位で集計
-        $isMonthly = $startDate->diffInDays($endDate) >= 30;
+        // 集計単位の取得（ユーザーが選択した値を優先、未選択の場合は期間に基づいて自動判定）
+        if ($request->has('is_monthly')) {
+            $isMonthly = (bool) $request->input('is_monthly');
+        } else {
+            // 期間が30日以上の場合は月単位、それ以外は日単位で集計
+            $isMonthly = $startDate->diffInDays($endDate) >= 30;
+        }
         
         // 売上データの取得
         $salesData = $this->getSalesData($startDate, $endDate, $isMonthly);
@@ -46,10 +51,18 @@ class ReportController extends Controller
         // 支払い方法別の集計
         $paymentMethodStats = $this->getPaymentMethodStats($startDate, $endDate);
         
+        // 支払い方法の表示ラベル
+        $paymentMethods = [
+            'credit_card' => 'クレジットカード',
+            'stripe' => 'クレジットカード',
+            'bank_transfer' => '銀行振込',
+        ];
+        
         return view('admin.reports.sales', compact(
             'salesData',
             'summary',
             'paymentMethodStats',
+            'paymentMethods',
             'startDate',
             'endDate',
             'isMonthly'

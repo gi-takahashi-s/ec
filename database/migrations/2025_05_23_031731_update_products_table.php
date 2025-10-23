@@ -25,7 +25,7 @@ return new class extends Migration
                 $table->text('specifications')->nullable()->after('features'); // 商品仕様
             }
             if (!Schema::hasColumn('products', 'sale_price')) {
-                $table->decimal('sale_price', 10, 2)->nullable()->after('price'); // セール価格
+                $table->integer('sale_price')->nullable()->after('price'); // セール価格
             }
             if (!Schema::hasColumn('products', 'sku')) {
                 $table->string('sku')->unique()->after('stock'); // 商品コード

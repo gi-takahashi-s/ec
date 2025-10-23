@@ -56,10 +56,6 @@
         @yield('content')
     </main>
 
-    <footer class="bg-gray-800 text-white py-6">
-        <div class="container mx-auto px-4">
-            <p class="text-center">&copy; {{ date('Y') }} ECサイト All Rights Reserved.</p>
-        </div>
-    </footer>
+    @include('components.footer')
 </body>
 </html> 
